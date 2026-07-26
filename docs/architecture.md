@@ -72,7 +72,7 @@ flowchart LR
 - Next.js for public acquisition pages and the authenticated application
 - Server rendering for SEO-sensitive pages
 - REST for standard product operations
-- WebSocket or Server-Sent Events for streaming tutor responses
+- Server-Sent Events for streaming tutor responses
 - Presigned S3 uploads for audio and large files
 
 ### Android and iOS
@@ -132,7 +132,7 @@ ECS Fargate is preferable to Kubernetes initially because it provides independen
 ## API design
 
 - Versioned REST endpoints for product operations
-- WebSocket or Server-Sent Events for tutor streaming
+- Server-Sent Events only for tutor streaming
 - OpenAPI as the client contract
 - Idempotency keys for learning attempts, exam submission, purchases, and webhook processing
 - Cursor-based pagination
@@ -359,7 +359,7 @@ The OpenAI integration should use the strongest available data-control and reten
 
 - Product API availability: 99.9%
 - Core API p95 latency: below 300 ms
-- Tutor first-token p95 latency: below 2 seconds
+- Tutor first verified learner-visible delta p95 latency: below 2 seconds
 - Transactional recovery point objective: at most 5 minutes
 
 ### Reliability mechanics
@@ -423,7 +423,7 @@ The OpenAI integration should use the strongest available data-control and reten
 
 ## Assumptions
 
-- Initial product is EU-first B2C/B2B SaaS.
+- Initial product is EU-first individual B2C SaaS; B2B tenancy is outside MVP scope.
 - One primary AWS region is sufficient at launch.
 - OpenAI is accessed through an external API.
 - The company does not claim accredited CEFR certification without a separate validation and accreditation program.

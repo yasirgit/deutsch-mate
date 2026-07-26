@@ -1,0 +1,1932 @@
+openapi: 3.1.0
+info:
+  title: Deutsch Mate Product API
+  version: 1.0.0
+  summary: Production MVP contract for the NestJS Product API
+  description: |
+    REST contract for the first public paid release. CEFR values are learning
+    estimates, never accredited certification. Tutor SSE sequencing is defined
+    in docs/API.md.
+  contact:
+    name: Deutsch Mate Engineering
+  license:
+    name: Proprietary
+servers:
+  - url: https://api.deutschmate.example/v1
+    description: Production
+  - url: https://api.staging.deutschmate.example/v1
+    description: Staging
+tags:
+  - { name: Health }
+  - { name: Identity }
+  - { name: Curriculum }
+  - { name: Learning }
+  - { name: Tutor }
+  - { name: Writing }
+  - { name: Billing }
+  - { name: Privacy }
+  - { name: Support }
+  - { name: Operations }
+security:
+  - oidc: []
+paths:
+  /health/live:
+    get:
+      tags: [Health]
+      operationId: getLiveness
+      security: []
+      responses:
+        "200":
+          description: Process is alive
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+              example: { status: ok, checkedAt: "2026-07-12T12:00:00Z" }
+  /health/ready:
+    get:
+      tags: [Health]
+      operationId: getReadiness
+      security: []
+      responses:
+        "200":
+          description: Critical dependencies are ready
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+  /me:
+    get:
+      tags: [Identity]
+      operationId: getCurrentUser
+      security: [{ oidc: [profile:read] }]
+      responses:
+        "200":
+          description: Current product user
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    patch:
+      tags: [Identity]
+      operationId: updateCurrentUser
+      description: Updates mutable account settings in iam.users using optimistic concurrency and idempotent replay.
+      security: [{ oidc: [profile:write] }]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { $ref: "#/components/schemas/UserPatch" }
+      responses:
+        "200":
+          description: Updated product user
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "428": { $ref: "#/components/responses/PreconditionRequired" }
+  /me/consents/requirements:
+    get:
+      tags: [Identity]
+      operationId: getConsentRequirements
+      security: [{ oidc: [profile:read] }]
+      responses:
+        "200":
+          description: Effective required documents and optional purposes
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [documents, purposes]
+                properties:
+                  documents:
+                    type: array
+                    items: { $ref: "#/components/schemas/LegalDocumentVersion" }
+                  purposes:
+                    type: array
+                    items: { type: string, enum: [marketing] }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /me/consents:
+    get:
+      tags: [Identity]
+      operationId: listCurrentConsents
+      security: [{ oidc: [profile:read] }]
+      responses:
+        "200":
+          description: Latest decision per purpose
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/ConsentEvent" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      tags: [Identity]
+      operationId: recordConsentEvents
+      security: [{ oidc: [profile:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [events]
+              properties:
+                events:
+                  type: array
+                  minItems: 1
+                  maxItems: 3
+                  items: { $ref: "#/components/schemas/ConsentEventInput" }
+      responses:
+        "201":
+          description: Append-only consent events
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/ConsentEvent" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /me/profile:
+    get:
+      tags: [Identity]
+      operationId: getCurrentProfile
+      security: [{ oidc: [profile:read] }]
+      responses:
+        "200":
+          description: Effective append-only profile version
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileVersion" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    put:
+      tags: [Identity]
+      operationId: updateCurrentProfile
+      security: [{ oidc: [profile:write] }]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProfileInput" }
+      responses:
+        "201":
+          description: New immutable profile version
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProfileVersion" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "428": { $ref: "#/components/responses/PreconditionRequired" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /me/onboarding:
+    get:
+      tags: [Identity]
+      operationId: getOnboardingState
+      security: [{ oidc: [profile:read] }]
+      responses:
+        "200":
+          description: Durable onboarding state
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OnboardingState" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    patch:
+      tags: [Identity]
+      operationId: updateOnboardingState
+      security: [{ oidc: [profile:write] }]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { $ref: "#/components/schemas/OnboardingPatch" }
+      responses:
+        "200":
+          description: Updated onboarding projection
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OnboardingState" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "428": { $ref: "#/components/responses/PreconditionRequired" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /me/onboarding/complete:
+    post:
+      tags: [Identity]
+      operationId: completeOnboarding
+      security: [{ oidc: [profile:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200":
+          description: Completed state and first unit
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [onboarding, recommendedUnit]
+                properties:
+                  onboarding: { $ref: "#/components/schemas/OnboardingState" }
+                  recommendedUnit: { $ref: "#/components/schemas/UnitSummary" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /curriculum/releases/current:
+    get:
+      tags: [Curriculum]
+      operationId: getCurrentCurriculumRelease
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/IfNoneMatch" }]
+      responses:
+        "200":
+          description: Current immutable published release
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CurriculumRelease" }
+        "304":
+          description: Not modified
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /curriculum/releases/{releaseId}/modules:
+    get:
+      tags: [Curriculum]
+      operationId: listCurriculumModules
+      security: [{ oidc: [learning:read] }]
+      parameters:
+        - { $ref: "#/components/parameters/ReleaseId" }
+        - { name: level, in: query, schema: { $ref: "#/components/schemas/CefrLevel" } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Limit" }
+      responses:
+        "200":
+          description: Published modules ordered by release ordinal
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ModulePage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /curriculum/units/{unitVersionId}:
+    get:
+      tags: [Curriculum]
+      operationId: getCurriculumUnit
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/UnitVersionId" }, { $ref: "#/components/parameters/IfNoneMatch" }]
+      responses:
+        "200":
+          description: Published unit and lesson summaries
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Unit" }
+        "304":
+          description: Not modified
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /curriculum/lessons/{lessonVersionId}:
+    get:
+      tags: [Curriculum]
+      operationId: getLesson
+      security: [{ oidc: [learning:read] }]
+      parameters:
+        - { $ref: "#/components/parameters/LessonVersionId" }
+        - { $ref: "#/components/parameters/IfNoneMatch" }
+      responses:
+        "200":
+          description: Published immutable lesson with activities
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lesson" }
+        "304":
+          description: Not modified
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /learning/sessions:
+    get:
+      tags: [Learning]
+      operationId: listLearningSessions
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Own sessions newest activity first
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LearningSessionPage" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+    post:
+      tags: [Learning]
+      operationId: createLearningSession
+      security: [{ oidc: [learning:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LearningSessionInput" }
+      responses:
+        "201":
+          description: Active learning session
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LearningSession" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /learning/sessions/{sessionId}:
+    get:
+      tags: [Learning]
+      operationId: getLearningSession
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      responses:
+        "200":
+          description: Own session
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LearningSession" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+    patch:
+      tags: [Learning]
+      operationId: updateLearningSession
+      security: [{ oidc: [learning:write] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }, { $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [status]
+              properties:
+                status: { type: string, enum: [completed, abandoned] }
+      responses:
+        "200":
+          description: Updated session
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LearningSession" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /learning/sessions/{sessionId}/attempts:
+    post:
+      tags: [Learning]
+      operationId: submitActivityAttempt
+      security: [{ oidc: [learning:write] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActivityAttemptInput" }
+            examples:
+              choice:
+                value: { activityVersionId: "018fa5c2-7b1d-7abc-8def-0123456789ab", clientAttemptId: "018fa5c3-7b1d-7abc-8def-0123456789ab", attemptNumber: 1, durationMs: 12500, response: { responseKind: choice, response: { selected: [B] } } }
+              writing:
+                value: { activityVersionId: "018fa5c2-7b1d-7abc-8def-0123456789ab", clientAttemptId: "018fa5c3-7b1d-7abc-8def-0123456789ab", attemptNumber: 1, response: { responseKind: text, textContent: "Ich wohne seit zwei Jahren in Berlin." } }
+      responses:
+        "201":
+          description: Deterministically completed attempt
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActivityAttempt" }
+        "202":
+          description: Writing attempt accepted for feedback
+          headers:
+            Location: { schema: { type: string, format: uri-reference } }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActivityAttempt" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /learning/attempts/{attemptId}:
+    get:
+      tags: [Learning]
+      operationId: getActivityAttempt
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/AttemptId" }]
+      responses:
+        "200":
+          description: Attempt, current score, and released feedback
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ActivityAttempt" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /learning/review-items:
+    get:
+      tags: [Learning]
+      operationId: listReviewItems
+      security: [{ oidc: [learning:read] }]
+      parameters:
+        - { name: state, in: query, schema: { type: string, enum: [due, scheduled, completed, suspended], default: due } }
+        - { $ref: "#/components/parameters/Cursor" }
+        - { $ref: "#/components/parameters/Limit" }
+      responses:
+        "200":
+          description: Own review projection ordered by due time
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReviewItemPage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /learning/recommendations:
+    post:
+      tags: [Learning]
+      operationId: createNextActivityRecommendation
+      security: [{ oidc: [learning:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                preferredKind: { type: string, enum: [lesson, review] }
+      responses:
+        "201":
+          description: Immutable reproducible recommendation run
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Recommendation" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /learning/progress:
+    get:
+      tags: [Learning]
+      operationId: getLearningProgress
+      security: [{ oidc: [learning:read] }]
+      responses:
+        "200":
+          description: Completion and proficiency evidence, explicitly separate
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Progress" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /tutor/runs:
+    post:
+      tags: [Tutor]
+      operationId: createTutorRun
+      security: [{ oidc: [tutor:use] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TutorRunInput" }
+      responses:
+        "202":
+          description: Queued tutor invocation
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TutorRunAccepted" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /tutor/runs/{runId}:
+    get:
+      tags: [Tutor]
+      operationId: getTutorRun
+      security: [{ oidc: [tutor:use] }]
+      parameters: [{ $ref: "#/components/parameters/RunId" }]
+      responses:
+        "200":
+          description: Authoritative durable run status and final safe output
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TutorRun" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /tutor/runs/{runId}/events:
+    get:
+      tags: [Tutor]
+      operationId: streamTutorRunEvents
+      security: [{ oidc: [tutor:use] }]
+      parameters:
+        - { $ref: "#/components/parameters/RunId" }
+        - name: Last-Event-ID
+          in: header
+          schema: { type: string, maxLength: 128 }
+      responses:
+        "200":
+          description: SSE stream; event ordering and payloads are normative in docs/API.md
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                examples: ["id: 12\nevent: message.delta\ndata: {\"runId\":\"018fa5c2-7b1d-7abc-8def-0123456789ab\",\"text\":\"Guten\"}\n\n"]
+        "404": { $ref: "#/components/responses/NotFound" }
+        "410": { $ref: "#/components/responses/Gone" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /writing-feedback/jobs/{attemptId}:
+    get:
+      tags: [Writing]
+      operationId: getWritingFeedbackJob
+      security: [{ oidc: [learning:read] }]
+      parameters: [{ $ref: "#/components/parameters/AttemptId" }]
+      responses:
+        "200":
+          description: Writing AI job and released feedback
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WritingFeedbackJob" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /billing/plans:
+    get:
+      tags: [Billing]
+      operationId: listPlans
+      security: []
+      parameters:
+        - { name: currency, in: query, schema: { type: string, pattern: "^[A-Z]{3}$", default: EUR } }
+      responses:
+        "200":
+          description: Active effective plan configuration
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/Plan" } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /billing/checkout-sessions:
+    post:
+      tags: [Billing]
+      operationId: createCheckoutSession
+      description: Creates Stripe Checkout in subscription mode; payment_method_types is never sent.
+      security: [{ oidc: [billing:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutInput" }
+      responses:
+        "201":
+          description: Stripe-hosted checkout redirect
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckoutSession" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /billing/customer-portal-sessions:
+    post:
+      tags: [Billing]
+      operationId: createCustomerPortalSession
+      security: [{ oidc: [billing:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [returnUrl]
+              properties:
+                returnUrl: { type: string, format: uri, maxLength: 2048 }
+      responses:
+        "201":
+          description: Short-lived Stripe Customer Portal URL
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, expiresAt]
+                properties:
+                  url: { type: string, format: uri }
+                  expiresAt: { type: string, format: date-time }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /billing/subscription:
+    get:
+      tags: [Billing]
+      operationId: getCurrentSubscription
+      security: [{ oidc: [billing:read] }]
+      responses:
+        "200":
+          description: Internal subscription projection
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Subscription" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /billing/entitlements:
+    get:
+      tags: [Billing]
+      operationId: listCurrentEntitlements
+      security: [{ oidc: [billing:read] }]
+      responses:
+        "200":
+          description: Internal effective feature access
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/Entitlement" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /webhooks/stripe:
+    post:
+      tags: [Billing]
+      operationId: receiveStripeWebhook
+      description: |
+        Stripe API 2026-05-27.dahlia. Verify Stripe-Signature against the exact raw
+        body before parsing; persist each event ID once and process idempotently.
+      security: []
+      parameters:
+        - name: Stripe-Signature
+          in: header
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 4096 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        "200":
+          description: Signature valid and event durably accepted or already received
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [received]
+                properties: { received: { type: boolean, const: true } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /privacy/requests:
+    get:
+      tags: [Privacy]
+      operationId: listPrivacyRequests
+      security: [{ oidc: [privacy:read] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Own requests newest first
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivacyRequestPage" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+    post:
+      tags: [Privacy]
+      operationId: createPrivacyRequest
+      security: [{ oidc: [privacy:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [type, identityConfirmationToken]
+              properties:
+                type: { type: string, enum: [export, delete] }
+                identityConfirmationToken: { type: string, minLength: 20, maxLength: 4096, writeOnly: true }
+      responses:
+        "202":
+          description: Durable request accepted
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivacyRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /privacy/requests/{privacyRequestId}:
+    get:
+      tags: [Privacy]
+      operationId: getPrivacyRequest
+      security: [{ oidc: [privacy:read] }]
+      parameters: [{ $ref: "#/components/parameters/PrivacyRequestId" }]
+      responses:
+        "200":
+          description: Own durable privacy workflow
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PrivacyRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /privacy/requests/{privacyRequestId}/download:
+    post:
+      tags: [Privacy]
+      operationId: createPrivacyExportDownload
+      security: [{ oidc: [privacy:read] }]
+      parameters: [{ $ref: "#/components/parameters/PrivacyRequestId" }]
+      responses:
+        "201":
+          description: Five-minute signed export download
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url, expiresAt]
+                properties:
+                  url: { type: string, format: uri }
+                  expiresAt: { type: string, format: date-time }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /support/cases:
+    get:
+      tags: [Support]
+      operationId: listSupportCases
+      security: [{ oidc: [support:write] }]
+      parameters: [{ $ref: "#/components/parameters/Cursor" }, { $ref: "#/components/parameters/Limit" }]
+      responses:
+        "200":
+          description: Own support cases newest first
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SupportCasePage" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+    post:
+      tags: [Support]
+      operationId: createSupportCase
+      security: [{ oidc: [support:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupportCaseInput" }
+      responses:
+        "201":
+          description: Categorized support case
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SupportCase" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /support/cases/{caseId}:
+    get:
+      tags: [Support]
+      operationId: getSupportCase
+      security: [{ oidc: [support:write] }]
+      parameters: [{ $ref: "#/components/parameters/CaseId" }]
+      responses:
+        "200":
+          description: Own case
+          headers:
+            ETag: { $ref: "#/components/headers/ETag" }
+            X-Request-Id: { $ref: "#/components/headers/RequestId" }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SupportCase" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /ops/content/releases:
+    post:
+      tags: [Operations]
+      operationId: createCurriculumRelease
+      description: Protected command used by repository release/import scripts after deterministic manifest validation; never exposed to learner clients.
+      security: [{ oidc: [content:write] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CurriculumReleaseInput" }
+      responses:
+        "201":
+          description: Draft immutable curriculum release aggregate
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CurriculumRelease" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /ops/content/releases/{releaseId}/review-events:
+    post:
+      tags: [Operations]
+      operationId: recordCurriculumReviewEvent
+      security: [{ oidc: [content:review] }]
+      parameters: [{ $ref: "#/components/parameters/ReleaseId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReviewEventInput" }
+      responses:
+        "201":
+          description: Immutable governance event
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReviewEvent" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /ops/content/releases/{releaseId}/publish:
+    post:
+      tags: [Operations]
+      operationId: publishCurriculumRelease
+      security: [{ oidc: [content:review] }]
+      parameters: [{ $ref: "#/components/parameters/ReleaseId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200":
+          description: Validated published release
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CurriculumRelease" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /ops/content/releases/{releaseId}/rollback:
+    post:
+      tags: [Operations]
+      operationId: rollbackCurriculumRelease
+      security: [{ oidc: [content:review] }]
+      parameters: [{ $ref: "#/components/parameters/ReleaseId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200":
+          description: Previously approved release selected without mutation
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CurriculumRelease" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /ops/ai/releases:
+    post:
+      tags: [Operations]
+      operationId: createAiRelease
+      description: Protected command used by governed release scripts to register already-versioned prompt/model routing; never exposed to learner clients.
+      security: [{ oidc: [ai:release] }]
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AiReleaseInput" }
+      responses:
+        "201":
+          description: Draft immutable AI routing release
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AiRelease" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /ops/ai/releases/{aiReleaseId}/publish:
+    post:
+      tags: [Operations]
+      operationId: publishAiRelease
+      security: [{ oidc: [ai:release, content:review] }]
+      parameters: [{ $ref: "#/components/parameters/AiReleaseId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200":
+          description: Evaluated approved AI release published
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AiRelease" }
+        "422": { $ref: "#/components/responses/Unprocessable" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+  /ops/ai/releases/{aiReleaseId}/rollback:
+    post:
+      tags: [Operations]
+      operationId: rollbackAiRelease
+      security: [{ oidc: [ai:release] }]
+      parameters: [{ $ref: "#/components/parameters/AiReleaseId" }, { $ref: "#/components/parameters/IdempotencyKey" }]
+      responses:
+        "200":
+          description: Approved rollback target selected
+          headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AiRelease" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+components:
+  securitySchemes:
+    oidc:
+      type: oauth2
+      description: Cognito OIDC Authorization Code with PKCE; JWT bearer token.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.deutschmate.example/oauth2/authorize
+          tokenUrl: https://auth.deutschmate.example/oauth2/token
+          scopes:
+            profile:read: Read own account, consent, profile, and onboarding
+            profile:write: Change own consent, profile, and onboarding
+            learning:read: Read published content and own learning state
+            learning:write: Create own sessions, attempts, and recommendations
+            tutor:use: Initiate and read own tutor runs
+            billing:read: Read own subscription and entitlements
+            billing:write: Create own checkout and portal sessions
+            privacy:read: Read own privacy workflows
+            privacy:write: Create own privacy workflows
+            support:write: Create and read own support cases
+            content:write: Create immutable draft content versions
+            content:review: Review and publish content
+            ai:release: Manage approved AI routing releases
+  parameters:
+    Cursor: { name: cursor, in: query, schema: { type: string, minLength: 1, maxLength: 2048 }, description: Opaque continuation cursor }
+    Limit: { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+    IdempotencyKey: { name: Idempotency-Key, in: header, required: true, schema: { type: string, minLength: 1, maxLength: 128, pattern: "^[\\x21-\\x7E]+$" } }
+    IfMatch: { name: If-Match, in: header, required: true, schema: { type: string, pattern: '^"[1-9][0-9]*"$' } }
+    IfNoneMatch: { name: If-None-Match, in: header, schema: { type: string, maxLength: 128 } }
+    ReleaseId: { name: releaseId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    UnitVersionId: { name: unitVersionId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    LessonVersionId: { name: lessonVersionId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    SessionId: { name: sessionId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    AttemptId: { name: attemptId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    RunId: { name: runId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    PrivacyRequestId: { name: privacyRequestId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    CaseId: { name: caseId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+    AiReleaseId: { name: aiReleaseId, in: path, required: true, schema: { $ref: "#/components/schemas/UuidV7" } }
+  headers:
+    RequestId: { description: End-to-end correlation UUID, schema: { type: string, format: uuid } }
+    ETag: { description: Strong resource version, schema: { type: string, examples: ['"3"'] } }
+    RateLimitLimit: { schema: { type: integer, minimum: 0 } }
+    RateLimitRemaining: { schema: { type: integer, minimum: 0 } }
+    RateLimitReset: { description: Seconds until reset, schema: { type: integer, minimum: 0 } }
+    RetryAfter: { description: Seconds before retry, schema: { type: integer, minimum: 0 } }
+  responses:
+    BadRequest:
+      description: Invalid request syntax, parameters, headers, or schema
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    Unauthorized:
+      description: Missing or invalid bearer token
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    Forbidden:
+      description: Scope, role, ownership disclosure policy, or entitlement denied
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    NotFound:
+      description: Resource absent or hidden by ownership
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    Conflict:
+      description: State, ETag, or idempotency conflict
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    Gone:
+      description: Stream resume window expired
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    Unprocessable:
+      description: Schema-valid request with a semantically invalid state transition
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    PreconditionRequired:
+      description: If-Match is required
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    TooManyRequests:
+      description: Rate or entitlement allowance exhausted
+      headers:
+        X-Request-Id: { $ref: "#/components/headers/RequestId" }
+        RateLimit-Limit: { $ref: "#/components/headers/RateLimitLimit" }
+        RateLimit-Remaining: { $ref: "#/components/headers/RateLimitRemaining" }
+        RateLimit-Reset: { $ref: "#/components/headers/RateLimitReset" }
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+    ServiceUnavailable:
+      description: Required dependency unavailable
+      headers: { X-Request-Id: { $ref: "#/components/headers/RequestId" } }
+      content: { application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } } }
+  schemas:
+    UuidV7: { type: string, format: uuid, pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", examples: ["018fa5c2-7b1d-7abc-8def-0123456789ab"] }
+    Decimal: { type: string, pattern: "^-?[0-9]+(?:\\.[0-9]+)?$", examples: ["0.85000"] }
+    BigInteger: { type: string, pattern: "^-?[0-9]+$", examples: ["1499"] }
+    CefrLevel: { type: string, enum: [A1, A2, B1, B2] }
+    Skill: { type: string, enum: [reading, listening, writing, vocabulary, grammar] }
+    ReleaseStatus: { type: string, enum: [draft, approved, published, retired] }
+    AiRunStatus: { type: string, enum: [queued, running, succeeded, blocked, failed, timed_out, cancelled] }
+    Page:
+      type: object
+      required: [nextCursor]
+      properties: { nextCursor: { type: [string, "null"] } }
+    Problem:
+      type: object
+      additionalProperties: false
+      required: [type, title, status, detail, instance, requestId, code]
+      properties:
+        type: { type: string, format: uri-reference, examples: ["https://api.deutschmate.example/problems/validation-failed"] }
+        title: { type: string }
+        status: { type: integer, minimum: 400, maximum: 599 }
+        detail: { type: string }
+        instance: { type: string, format: uri-reference }
+        requestId: { type: string, format: uuid }
+        code: { type: string, pattern: "^[a-z][a-z0-9_]*$" }
+        errors:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [path, code, message]
+            properties: { path: { type: string }, code: { type: string }, message: { type: string } }
+      example: { type: "https://api.deutschmate.example/problems/validation-failed", title: "Validation failed", status: 400, detail: "One or more fields are invalid.", instance: "/v1/me/profile", requestId: "018fa5c2-7b1d-7abc-8def-0123456789ab", code: validation_failed, errors: [{ path: "/studyDaysPerWeek", code: maximum, message: "Must be at most 7." }] }
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, checkedAt]
+      properties: { status: { type: string, enum: [ok] }, checkedAt: { type: string, format: date-time } }
+    User:
+      type: object
+      additionalProperties: false
+      required: [id, status, interfaceLocale, roles, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        status: { type: string, enum: [active, deletion_pending, deleted, blocked] }
+        primaryEmail: { type: [string, "null"], format: email }
+        interfaceLocale: { type: string, maxLength: 16, examples: [en] }
+        countryCode: { type: [string, "null"], pattern: "^[A-Z]{2}$" }
+        birthYear: { type: [integer, "null"], minimum: 1900, maximum: 2100 }
+        ageGateConfirmedAt: { type: [string, "null"], format: date-time }
+        roles: { type: array, uniqueItems: true, items: { type: string, enum: [learner, content_editor, content_reviewer, support, privacy_operator, billing_operator, admin] } }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    UserPatch:
+      type: object
+      additionalProperties: false
+      required: [interfaceLocale]
+      properties:
+        interfaceLocale: { type: string, minLength: 2, maxLength: 16, examples: [en] }
+    LegalDocumentVersion:
+      type: object
+      additionalProperties: false
+      required: [id, documentCode, version, locale, sha256, publishedAt, effectiveAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        documentCode: { type: string, enum: [terms, privacy, marketing] }
+        version: { type: integer, minimum: 1 }
+        locale: { type: string, maxLength: 16 }
+        sha256: { type: string, pattern: "^[0-9a-f]{64}$" }
+        publishedAt: { type: string, format: date-time }
+        effectiveAt: { type: string, format: date-time }
+    ConsentEventBase:
+      type: object
+      required: [purposeCode, decision]
+      properties:
+        documentVersionId: { $ref: "#/components/schemas/UuidV7" }
+        purposeCode: { type: string, enum: [terms, privacy, marketing] }
+        decision: { type: string, enum: [granted, withdrawn, declined] }
+    ConsentEventInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ConsentEventBase" }
+        - type: object
+          required: [source]
+          properties:
+            source:
+              type: string
+              enum: [web, ios, android]
+              description: Learner-controlled client source; privileged admin is never accepted here.
+        - if:
+            properties:
+              purposeCode: { enum: [terms, privacy] }
+            required: [purposeCode]
+          then:
+            properties:
+              documentVersionId: {}
+            required: [documentVersionId]
+          else:
+            properties:
+              documentVersionId: false
+      unevaluatedProperties: false
+    ConsentEvent:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ConsentEventBase" }
+        - type: object
+          required: [id, source, occurredAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            source: { type: string, enum: [web, ios, android, admin] }
+            occurredAt: { type: string, format: date-time }
+        - if:
+            properties:
+              purposeCode: { enum: [terms, privacy] }
+            required: [purposeCode]
+          then:
+            properties:
+              documentVersionId: {}
+            required: [documentVersionId]
+      unevaluatedProperties: false
+    ProfileBase:
+      type: object
+      required: [goal, selectedLevel, preferences]
+      properties:
+        goal: { type: string, enum: [relocation, work, study, travel, daily_life, general] }
+        selectedLevel: { $ref: "#/components/schemas/CefrLevel" }
+        targetLevel: { oneOf: [{ $ref: "#/components/schemas/CefrLevel" }, { type: "null" }] }
+        studyMinutesPerDay: { type: [integer, "null"], minimum: 5, maximum: 180 }
+        studyDaysPerWeek: { type: [integer, "null"], minimum: 1, maximum: 7 }
+        preferences: { type: object, additionalProperties: true }
+    ProfileInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ProfileBase" }
+      unevaluatedProperties: false
+    ProfileVersion:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ProfileBase" }
+        - type: object
+          required: [id, version, effectiveAt, createdAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            version: { type: integer, minimum: 1 }
+            supersedesId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+            effectiveAt: { type: string, format: date-time }
+            createdAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    OnboardingPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        stepCode: { type: string, maxLength: 40, examples: [level] }
+        completedSteps: { type: array, uniqueItems: true, items: { type: string, maxLength: 40 } }
+    OnboardingState:
+      type: object
+      additionalProperties: false
+      required: [stepCode, completedSteps, createdAt, updatedAt]
+      properties:
+        stepCode: { type: string, maxLength: 40 }
+        completedSteps: { type: array, items: { type: string } }
+        completedAt: { type: [string, "null"], format: date-time }
+        recommendedUnitVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CurriculumReleaseBase:
+      type: object
+      required: [releaseKey, version, title, description, manifestSha256]
+      properties:
+        releaseKey: { type: string, maxLength: 80 }
+        version: { type: integer, minimum: 1 }
+        title: { type: string, maxLength: 200 }
+        description: { type: string, maxLength: 2000 }
+        manifestSha256: { type: string, pattern: "^[0-9a-f]{64}$" }
+    CurriculumReleaseInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CurriculumReleaseBase" }
+      unevaluatedProperties: false
+    CurriculumRelease:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CurriculumReleaseBase" }
+        - type: object
+          required: [id, status, createdAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            status: { $ref: "#/components/schemas/ReleaseStatus" }
+            approvedAt: { type: [string, "null"], format: date-time }
+            publishedAt: { type: [string, "null"], format: date-time }
+            retiredAt: { type: [string, "null"], format: date-time }
+            createdAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    ModuleSummary:
+      type: object
+      additionalProperties: false
+      required: [id, moduleKey, version, level, title, description, ordinal, units]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        moduleKey: { type: string, maxLength: 80 }
+        version: { type: integer, minimum: 1 }
+        level: { $ref: "#/components/schemas/CefrLevel" }
+        title: { type: string }
+        description: { type: string }
+        ordinal: { type: integer, minimum: 1 }
+        units: { type: array, items: { $ref: "#/components/schemas/UnitSummary" } }
+    ModulePage:
+      type: object
+      required: [items, page]
+      properties: { items: { type: array, items: { $ref: "#/components/schemas/ModuleSummary" } }, page: { $ref: "#/components/schemas/Page" } }
+    UnitBase:
+      type: object
+      required: [id, unitKey, version, moduleKey, level, title, summary, ordinal, estimatedMinutes, accessTier]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        unitKey: { type: string, maxLength: 80 }
+        version: { type: integer, minimum: 1 }
+        moduleKey: { type: string, maxLength: 80 }
+        level: { $ref: "#/components/schemas/CefrLevel" }
+        title: { type: string }
+        summary: { type: string }
+        ordinal: { type: integer, minimum: 1 }
+        estimatedMinutes: { type: integer, minimum: 1, maximum: 180 }
+        accessTier: { type: string, enum: [free, premium] }
+        locked: { type: boolean, default: false }
+    UnitSummary:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/UnitBase" }
+      unevaluatedProperties: false
+    CefrDescriptor:
+      type: object
+      additionalProperties: false
+      required: [id, descriptorKey, version, level, skill, sourceName, sourceEdition, canDo]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        descriptorKey: { type: string, maxLength: 100 }
+        version: { type: integer, minimum: 1 }
+        level: { $ref: "#/components/schemas/CefrLevel" }
+        skill: { $ref: "#/components/schemas/Skill" }
+        sourceName: { type: string, maxLength: 200 }
+        sourceEdition: { type: string, maxLength: 100 }
+        canDo:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: Client-visible CEFR-aligned can-do descriptor text; not a certification claim.
+    Objective:
+      type: object
+      additionalProperties: false
+      required: [id, objectiveKey, version, level, skill, title, description, cefrDescriptors]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        objectiveKey: { type: string }
+        version: { type: integer, minimum: 1 }
+        level: { $ref: "#/components/schemas/CefrLevel" }
+        skill: { $ref: "#/components/schemas/Skill" }
+        title: { type: string }
+        description: { type: string }
+        cefrDescriptors:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/CefrDescriptor" }
+    Unit:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/UnitBase" }
+        - type: object
+          required: [objectives, prerequisiteUnitVersionIds, lessons]
+          properties:
+            objectives: { type: array, items: { $ref: "#/components/schemas/Objective" } }
+            prerequisiteUnitVersionIds: { type: array, items: { $ref: "#/components/schemas/UuidV7" } }
+            lessons: { type: array, items: { $ref: "#/components/schemas/LessonSummary" } }
+      unevaluatedProperties: false
+    LessonBase:
+      type: object
+      required: [id, lessonKey, version, unitKey, title, estimatedMinutes, required, ordinal]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        lessonKey: { type: string }
+        version: { type: integer, minimum: 1 }
+        unitKey: { type: string }
+        title: { type: string }
+        estimatedMinutes: { type: integer, minimum: 1 }
+        required: { type: boolean }
+        ordinal: { type: integer, minimum: 1 }
+    LessonSummary:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/LessonBase" }
+      unevaluatedProperties: false
+    Activity:
+      type: object
+      additionalProperties: false
+      required: [id, activityKey, version, type, level, prompt, configuration, maxScore, required, assets, objectives, ordinal]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        activityKey: { type: string }
+        version: { type: integer, minimum: 1 }
+        type: { type: string, enum: [explanation, selection, matching, ordering, cloze, typed_response, listening, writing, formative_check] }
+        level: { $ref: "#/components/schemas/CefrLevel" }
+        prompt: { type: object, description: Schema-validated rich-text AST, additionalProperties: true }
+        configuration: { type: object, additionalProperties: true }
+        maxScore: { $ref: "#/components/schemas/Decimal" }
+        required: { type: boolean }
+        transcriptPolicy: { type: [string, "null"], enum: [always, after_first_submission, after_completion, never, null] }
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/ActivityMediaAsset" }
+          description: Approved client-safe assets; storage bucket names and S3 object keys are never exposed.
+        objectives: { type: array, items: { $ref: "#/components/schemas/Objective" } }
+        ordinal: { type: integer, minimum: 1 }
+    ActivityMediaAsset:
+      type: object
+      required: [purpose, contentType, altText, transcriptAvailable]
+      properties:
+        purpose: { type: string, enum: [audio, image, attachment] }
+        contentType:
+          type: string
+          pattern: "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"
+          description: Verified media type from the authoritative media registry.
+        altText:
+          type: [string, "null"]
+          maxLength: 2000
+          description: Accessible alternative text when applicable; null only when the asset is purely decorative or audio.
+        transcriptAvailable:
+          type: boolean
+          description: Whether transcript content is currently permitted by the activity transcript policy.
+        transcriptContent:
+          type: [object, "null"]
+          additionalProperties: true
+          description: Schema-validated rich-text transcript when policy permits; otherwise null or omitted.
+      oneOf:
+        - required: [mediaObjectId]
+          properties:
+            mediaObjectId:
+              allOf: [{ $ref: "#/components/schemas/UuidV7" }]
+              description: Opaque media registry identifier; never an S3 key.
+        - required: [downloadUrl, downloadExpiresAt]
+          properties:
+            downloadUrl:
+              type: string
+              format: uri
+              description: Short-lived, purpose-bound URL authorizing only this approved asset download.
+            downloadExpiresAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    Lesson:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/LessonBase" }
+        - type: object
+          required: [explanation, examples, completionRule, activities]
+          properties:
+            explanation: { type: object, additionalProperties: true }
+            examples: { type: object, additionalProperties: true }
+            completionRule: { type: object, additionalProperties: true }
+            activities: { type: array, items: { $ref: "#/components/schemas/Activity" } }
+      unevaluatedProperties: false
+    LearningSessionBase:
+      type: object
+      required: [curriculumReleaseId, unitVersionId, clientPlatform]
+      properties:
+        curriculumReleaseId: { $ref: "#/components/schemas/UuidV7" }
+        unitVersionId: { $ref: "#/components/schemas/UuidV7" }
+        lessonVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        clientPlatform: { type: string, enum: [web, ios, android] }
+    LearningSessionInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/LearningSessionBase" }
+      unevaluatedProperties: false
+    LearningSession:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/LearningSessionBase" }
+        - type: object
+          required: [id, status, startedAt, lastActivityAt, createdAt, updatedAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            status: { type: string, enum: [active, completed, abandoned] }
+            startedAt: { type: string, format: date-time }
+            lastActivityAt: { type: string, format: date-time }
+            completedAt: { type: [string, "null"], format: date-time }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    LearningSessionPage:
+      type: object
+      required: [items, page]
+      properties: { items: { type: array, items: { $ref: "#/components/schemas/LearningSession" } }, page: { $ref: "#/components/schemas/Page" } }
+    AttemptResponseInput:
+      oneOf:
+        - type: object
+          additionalProperties: false
+          required: [responseKind, response]
+          properties: { responseKind: { type: string, enum: [structured, choice] }, response: { type: object, additionalProperties: true } }
+        - type: object
+          additionalProperties: false
+          required: [responseKind, textContent]
+          properties: { responseKind: { type: string, const: text }, textContent: { type: string, minLength: 1, maxLength: 10000 } }
+    ActivityAttemptInput:
+      type: object
+      additionalProperties: false
+      required: [activityVersionId, clientAttemptId, attemptNumber, response]
+      properties:
+        activityVersionId: { $ref: "#/components/schemas/UuidV7" }
+        clientAttemptId: { $ref: "#/components/schemas/UuidV7" }
+        attemptNumber: { type: integer, minimum: 1 }
+        durationMs: { type: [integer, "null"], minimum: 0 }
+        response: { $ref: "#/components/schemas/AttemptResponseInput" }
+    AttemptScore:
+      type: object
+      additionalProperties: false
+      required: [id, score, maxScore, passed, scoringMethod, algorithmVersion, details, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        score: { $ref: "#/components/schemas/Decimal" }
+        maxScore: { $ref: "#/components/schemas/Decimal" }
+        passed: { type: boolean }
+        scoringMethod: { type: string, enum: [deterministic, verified_ai] }
+        algorithmVersion: { type: string, maxLength: 40 }
+        details: { type: object, additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+    Feedback:
+      type: object
+      additionalProperties: false
+      required: [id, feedbackKind, feedback, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        feedbackKind: { type: string, enum: [deterministic, ai, unavailable] }
+        correctedText: { type: [string, "null"] }
+        feedback: { type: object, additionalProperties: true }
+        learnerDisposition: { type: [string, "null"], enum: [accepted, retried, dismissed, null] }
+        contentExpiresAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+    ActivityAttempt:
+      type: object
+      additionalProperties: false
+      required: [id, sessionId, activityVersionId, clientAttemptId, attemptNumber, status, submittedAt, algorithmVersion, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        sessionId: { $ref: "#/components/schemas/UuidV7" }
+        activityVersionId: { $ref: "#/components/schemas/UuidV7" }
+        answerKeyVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        rubricVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        clientAttemptId: { $ref: "#/components/schemas/UuidV7" }
+        attemptNumber: { type: integer, minimum: 1 }
+        status: { type: string, enum: [submitted, scored, feedback_pending, completed, feedback_unavailable] }
+        submittedAt: { type: string, format: date-time }
+        durationMs: { type: [integer, "null"], minimum: 0 }
+        algorithmVersion: { type: string }
+        score: { oneOf: [{ $ref: "#/components/schemas/AttemptScore" }, { type: "null" }] }
+        feedback: { oneOf: [{ $ref: "#/components/schemas/Feedback" }, { type: "null" }] }
+        createdAt: { type: string, format: date-time }
+    ReviewItem:
+      type: object
+      additionalProperties: false
+      required: [id, objectiveVersionId, sourceAttemptId, algorithmVersion, dueAt, intervalDays, ease, state, lastEvidenceId, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        objectiveVersionId: { $ref: "#/components/schemas/UuidV7" }
+        sourceAttemptId: { $ref: "#/components/schemas/UuidV7" }
+        algorithmVersion: { type: string }
+        dueAt: { type: string, format: date-time }
+        intervalDays: { $ref: "#/components/schemas/Decimal" }
+        ease: { $ref: "#/components/schemas/Decimal" }
+        state: { type: string, enum: [due, scheduled, completed, suspended] }
+        lastEvidenceId: { $ref: "#/components/schemas/UuidV7" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ReviewItemPage:
+      type: object
+      required: [items, page]
+      properties: { items: { type: array, items: { $ref: "#/components/schemas/ReviewItem" } }, page: { $ref: "#/components/schemas/Page" } }
+    Recommendation:
+      type: object
+      additionalProperties: false
+      required: [id, algorithmVersion, profileVersionId, entitlementSnapshot, candidateSnapshot, kind, reasonCodes, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        algorithmVersion: { type: string }
+        profileVersionId: { $ref: "#/components/schemas/UuidV7" }
+        proficiencySnapshotId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        entitlementSnapshot: { type: object, additionalProperties: true }
+        candidateSnapshot: { type: object, additionalProperties: true }
+        kind: { type: string, enum: [lesson, review, upgrade] }
+        recommendedUnitVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        recommendedReviewItemId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        reasonCodes: { type: array, items: { type: string } }
+        createdAt: { type: string, format: date-time }
+    Progress:
+      type: object
+      additionalProperties: false
+      required: [units, reviewDueCount, recentActivityAt, proficiency]
+      properties:
+        units:
+          type: array
+          items:
+            type: object
+            required: [unitVersionId, completedRequired, requiredTotal, completionRatio]
+            properties:
+              unitVersionId: { $ref: "#/components/schemas/UuidV7" }
+              completedRequired: { type: integer, minimum: 0 }
+              requiredTotal: { type: integer, minimum: 0 }
+              completionRatio: { $ref: "#/components/schemas/Decimal" }
+              completedAt: { type: [string, "null"], format: date-time }
+              lastAttemptAt: { type: [string, "null"], format: date-time }
+        reviewDueCount: { type: integer, minimum: 0 }
+        recentActivityAt: { type: [string, "null"], format: date-time }
+        proficiency:
+          type: object
+          additionalProperties: false
+          required: [skillVector, objectiveEvidence, evidenceCutoffAt, algorithmVersion, disclaimerCode]
+          properties:
+            skillVector: { type: object, additionalProperties: { type: object, required: [estimate, uncertainty, evidenceCount], properties: { estimate: { type: string }, uncertainty: { $ref: "#/components/schemas/Decimal" }, evidenceCount: { type: integer, minimum: 0 } } } }
+            objectiveEvidence:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required: [objectiveVersionId, skill, estimate, uncertainty, evidenceCount, latestEvidenceAt]
+                properties:
+                  objectiveVersionId: { $ref: "#/components/schemas/UuidV7" }
+                  skill: { type: string, enum: [reading, listening, writing, vocabulary, grammar] }
+                  estimate: { type: string }
+                  uncertainty: { $ref: "#/components/schemas/Decimal" }
+                  evidenceCount: { type: integer, minimum: 0 }
+                  latestEvidenceAt: { type: string, format: date-time }
+            evidenceCutoffAt: { type: string, format: date-time }
+            algorithmVersion: { type: string }
+            disclaimerCode: { type: string, const: cefr_estimate_not_certificate }
+    TutorRunInput:
+      type: object
+      additionalProperties: false
+      required: [clientMessageId, message]
+      properties:
+        threadId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        clientMessageId: { $ref: "#/components/schemas/UuidV7" }
+        contextUnitVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        message: { type: string, minLength: 1, maxLength: 8000 }
+    TutorRunAccepted:
+      type: object
+      additionalProperties: false
+      required: [runId, threadId, status, statusUrl, streamUrl]
+      properties:
+        runId: { $ref: "#/components/schemas/UuidV7" }
+        threadId: { $ref: "#/components/schemas/UuidV7" }
+        status: { $ref: "#/components/schemas/AiRunStatus" }
+        statusUrl: { type: string, format: uri-reference }
+        streamUrl: { type: string, format: uri-reference }
+    TutorRun:
+      type: object
+      additionalProperties: false
+      required: [id, threadId, releaseId, status, traceId, startedAt, inputTokens, outputTokens, estimatedCostMicros, currency, contentExpiresAt, createdAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        threadId: { $ref: "#/components/schemas/UuidV7" }
+        releaseId: { $ref: "#/components/schemas/UuidV7" }
+        status: { $ref: "#/components/schemas/AiRunStatus" }
+        disposition: { type: [string, "null"], enum: [released, blocked, safe_failure, internal_only, null] }
+        traceId: { $ref: "#/components/schemas/UuidV7" }
+        startedAt: { type: string, format: date-time }
+        firstVerifiedDeltaAt:
+          type: [string, "null"]
+          format: date-time
+          description: Time the first post-verification learner-visible SSE delta was emitted; raw provider token timing is never exposed.
+        completedAt: { type: [string, "null"], format: date-time }
+        latencyMs: { type: [integer, "null"], minimum: 0 }
+        inputTokens: { type: integer, minimum: 0 }
+        outputTokens: { type: integer, minimum: 0 }
+        estimatedCostMicros: { $ref: "#/components/schemas/BigInteger" }
+        currency: { type: string, pattern: "^[A-Z]{3}$" }
+        errorCode: { type: [string, "null"] }
+        verifierSummary: { type: [object, "null"], additionalProperties: true }
+        finalMessage: { type: [string, "null"] }
+        contentExpiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+    WritingFeedbackJob:
+      type: object
+      additionalProperties: false
+      required: [attemptId, runId, status, disposition, feedback]
+      properties:
+        attemptId: { $ref: "#/components/schemas/UuidV7" }
+        runId: { $ref: "#/components/schemas/UuidV7" }
+        status: { $ref: "#/components/schemas/AiRunStatus" }
+        disposition: { type: [string, "null"], enum: [released, blocked, safe_failure, internal_only, null] }
+        verifierSummary: { type: [object, "null"], additionalProperties: true }
+        feedback: { oneOf: [{ $ref: "#/components/schemas/Feedback" }, { type: "null" }] }
+    Plan:
+      type: object
+      additionalProperties: false
+      required: [id, planCode, name, active, prices, features]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        planCode: { type: string, enum: [free, premium] }
+        name: { type: string }
+        active: { type: boolean }
+        prices:
+          type: array
+          items:
+            type: object
+            required: [id, provider, currency, amountMinor, billingInterval, taxBehavior, effectiveFrom]
+            properties:
+              id: { $ref: "#/components/schemas/UuidV7" }
+              provider: { type: string, enum: [stripe] }
+              currency: { type: string, pattern: "^[A-Z]{3}$" }
+              amountMinor: { $ref: "#/components/schemas/BigInteger" }
+              billingInterval: { type: string, enum: [none, month, year] }
+              taxBehavior: { type: string, enum: [inclusive, exclusive, unspecified] }
+              effectiveFrom: { type: string, format: date-time }
+              effectiveTo: { type: [string, "null"], format: date-time }
+        features:
+          type: array
+          items:
+            type: object
+            required: [featureCode, configVersion, enabled, effectiveFrom]
+            properties:
+              featureCode: { type: string }
+              configVersion: { type: integer, minimum: 1 }
+              limitValue: { oneOf: [{ $ref: "#/components/schemas/BigInteger" }, { type: "null" }] }
+              limitPeriod: { type: [string, "null"], enum: [day, month, billing_period, null] }
+              enabled: { type: boolean }
+              effectiveFrom: { type: string, format: date-time }
+              effectiveTo: { type: [string, "null"], format: date-time }
+    CheckoutInput:
+      type: object
+      additionalProperties: false
+      required: [planPriceId, successUrl, cancelUrl]
+      properties:
+        planPriceId: { $ref: "#/components/schemas/UuidV7" }
+        successUrl: { type: string, format: uri, maxLength: 2048 }
+        cancelUrl: { type: string, format: uri, maxLength: 2048 }
+    CheckoutSession:
+      type: object
+      additionalProperties: false
+      required: [id, provider, planPriceId, status, checkoutUrl, expiresAt, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        provider: { type: string, const: stripe }
+        planPriceId: { $ref: "#/components/schemas/UuidV7" }
+        status: { type: string, enum: [creating, open, completed, expired, failed] }
+        checkoutUrl: { type: string, format: uri }
+        expiresAt: { type: string, format: date-time }
+        completedAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Subscription:
+      type: object
+      additionalProperties: false
+      required: [id, provider, planPriceId, status, cancelAtPeriodEnd, providerEventCreatedAt, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        provider: { type: string, enum: [stripe, apple, google, manual] }
+        planPriceId: { $ref: "#/components/schemas/UuidV7" }
+        status: { type: string, enum: [incomplete, trialing, active, past_due, paused, cancelled, unpaid] }
+        providerEventCreatedAt: { type: string, format: date-time }
+        currentPeriodStart: { type: [string, "null"], format: date-time }
+        currentPeriodEnd: { type: [string, "null"], format: date-time }
+        cancelAtPeriodEnd: { type: boolean }
+        cancelledAt: { type: [string, "null"], format: date-time }
+        endedAt: { type: [string, "null"], format: date-time }
+        reconciledAt: { type: [string, "null"], format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Entitlement:
+      type: object
+      additionalProperties: false
+      required: [id, featureCode, sourceProvider, status, validFrom, allowance, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        featureCode: { type: string, maxLength: 60 }
+        sourceProvider: { type: string, enum: [stripe, apple, google, manual] }
+        sourceSubscriptionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        status: { type: string, enum: [active, expired, revoked] }
+        validFrom: { type: string, format: date-time }
+        validUntil: { type: [string, "null"], format: date-time }
+        allowance: { type: object, additionalProperties: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PrivacyRequest:
+      type: object
+      additionalProperties: false
+      required: [id, type, status, requestedAt, dueAt, retentionExceptions, createdAt, updatedAt]
+      properties:
+        id: { $ref: "#/components/schemas/UuidV7" }
+        type: { type: string, enum: [export, delete] }
+        status: { type: string, enum: [requested, identity_verified, processing, completed, partially_retained, rejected, cancelled, failed] }
+        requestedAt: { type: string, format: date-time }
+        identityVerifiedAt: { type: [string, "null"], format: date-time }
+        dueAt: { type: string, format: date-time }
+        completedAt: { type: [string, "null"], format: date-time }
+        retentionExceptions: { type: object, additionalProperties: true }
+        failureCode: { type: [string, "null"] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PrivacyRequestPage:
+      type: object
+      required: [items, page]
+      properties: { items: { type: array, items: { $ref: "#/components/schemas/PrivacyRequest" } }, page: { $ref: "#/components/schemas/Page" } }
+    SupportCaseBase:
+      type: object
+      required: [category, subject, description]
+      properties:
+        category: { type: string, enum: [account, learning, privacy, billing] }
+        subject: { type: string, minLength: 1, maxLength: 200 }
+        description: { type: string, minLength: 1, maxLength: 10000 }
+        contactEmail: { type: [string, "null"], format: email }
+        aiRunId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+    SupportCaseInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/SupportCaseBase" }
+      unevaluatedProperties: false
+    SupportCase:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/SupportCaseBase" }
+        - type: object
+          required: [id, status, createdAt, updatedAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            status: { type: string, enum: [open, in_progress, waiting_for_user, resolved, closed] }
+            resolvedAt: { type: [string, "null"], format: date-time }
+            createdAt: { type: string, format: date-time }
+            updatedAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    SupportCasePage:
+      type: object
+      required: [items, page]
+      properties: { items: { type: array, items: { $ref: "#/components/schemas/SupportCase" } }, page: { $ref: "#/components/schemas/Page" } }
+    ReviewEventBase:
+      type: object
+      required: [validationResult]
+      properties:
+        qualification: { type: [string, "null"], maxLength: 500 }
+        validationResult: { type: object, additionalProperties: true }
+        comment: { type: [string, "null"], maxLength: 2000 }
+    ReviewEventInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ReviewEventBase" }
+        - type: object
+          required: [action]
+          properties:
+            action:
+              type: string
+              enum: [submitted, approved, rejected, retired, rollback_selected]
+              description: Human governance action; published is emitted only by the publication service.
+      unevaluatedProperties: false
+    ReviewEvent:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/ReviewEventBase" }
+        - type: object
+          required: [id, aggregateType, aggregateId, action, occurredAt, createdAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            aggregateType: { type: string, enum: [curriculum_release, ai_release] }
+            aggregateId: { $ref: "#/components/schemas/UuidV7" }
+            action: { type: string, enum: [submitted, approved, rejected, published, retired, rollback_selected] }
+            occurredAt: { type: string, format: date-time }
+            createdAt: { type: string, format: date-time }
+      unevaluatedProperties: false
+    AiReleaseBase:
+      type: object
+      required: [feature, version, promptVersionId, modelConfigVersionId, evaluationResult]
+      properties:
+        feature: { type: string, enum: [tutor_chat, writing_correction, content_validation] }
+        version: { type: integer, minimum: 1 }
+        promptVersionId: { $ref: "#/components/schemas/UuidV7" }
+        modelConfigVersionId: { $ref: "#/components/schemas/UuidV7" }
+        verifierPromptVersionId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+        evaluationResult: { type: object, additionalProperties: true }
+        rollbackReleaseId: { oneOf: [{ $ref: "#/components/schemas/UuidV7" }, { type: "null" }] }
+    AiReleaseInput:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/AiReleaseBase" }
+      unevaluatedProperties: false
+    AiRelease:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/AiReleaseBase" }
+        - type: object
+          required: [id, status, createdAt]
+          properties:
+            id: { $ref: "#/components/schemas/UuidV7" }
+            status: { $ref: "#/components/schemas/ReleaseStatus" }
+            approvedAt: { type: [string, "null"], format: date-time }
+            publishedAt: { type: [string, "null"], format: date-time }
+            createdAt: { type: string, format: date-time }
+      unevaluatedProperties: false
