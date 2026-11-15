@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "objective",
+  "objectiveKey": "obj.a1.smoke.u4",
+  "version": 1,
+  "level": "A1",
+  "skill": "vocabulary",
+  "title": "Smoke objective 4",
+  "description": "CEFR-aligned A1 vocabulary objective for smoke unit 4.",
+  "descriptors": [
+    {
+      "descriptorKey": "cefr.a1.smoke.u4",
+      "descriptorVersion": 1
+    }
+  ]
+}

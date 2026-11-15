@@ -1,0 +1,41 @@
+{
+  // Dependency hygiene for `pnpm deps:check` (DM-003): fails on undeclared
+  // ("unlisted") and unused dependencies across the pnpm workspace
+  // (docs/CODING_STANDARDS.md §2, §16). Entries are auto-detected from
+  // package.json manifests and the eslint/next/vitest/dependency-cruiser
+  // plugins.
+  "$schema": "https://unpkg.com/knip@6.29.0/schema.json",
+  // deps:check gates dependency hygiene only. Unused-export reporting is
+  // intentionally out of scope for this gate: exported types/values on
+  // package boundaries (e.g. scripts/lib/env.ts PostgresConnection) are part
+  // of deliberate module APIs even before every consumer lands.
+  "exclude": ["exports", "types"],
+  "workspaces": {
+    ".": {},
+    "apps/*": {},
+    "packages/*": {},
+    "packages/config": {
+      // Runtime env entry is published as `./env` → dist; knip cannot map
+      // the built artifact back to `src/env` without an explicit entry.
+      "entry": ["src/env/index.ts!", "src/**/*.{mjs,cjs}!"]
+    },
+    "packages/content-schemas": {
+      // CLI validates content/examples and is invoked via `pnpm content:schema`.
+      "entry": ["src/cli/content-schema.ts!"]
+    },
+    "packages/content-pipeline": {
+      // Fixture writer invoked via tsx; not part of the published package surface.
+      "entry": ["src/fixtures/write-smoke.ts!"]
+    },
+    "packages/database": {
+      // Invoked as a CLI by `scripts/db-codegen.ts`, not imported from source.
+      "ignoreDependencies": ["kysely-codegen"]
+    },
+    "packages/test-kit": {
+      // Boundary fixtures deliberately import forbidden/undeclared packages;
+      // the regression tests feed them to the checkers programmatically.
+      "ignore": ["fixtures/**"]
+    },
+    "scripts": {}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "kind": "cefr_descriptor",
+  "descriptorKey": "cefr.a1.smoke.u6",
+  "version": 1,
+  "level": "A1",
+  "skill": "vocabulary",
+  "sourceName": "Common European Framework of Reference for Languages",
+  "sourceEdition": "Companion Volume 2020",
+  "descriptorText": "Can use basic expressions for smoke unit 6."
+}

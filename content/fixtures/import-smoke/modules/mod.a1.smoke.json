@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "module",
+  "moduleKey": "mod.a1.smoke",
+  "version": 1,
+  "level": "A1",
+  "title": "A1 Smoke Module",
+  "description": "Import-smoke module with six minimal units meeting MVP G1 inventory rules.",
+  "ordinal": 1,
+  "units": [
+    {
+      "ordinal": 1,
+      "unitKey": "unit.a1.smoke.u1",
+      "unitVersion": 1
+    },
+    {
+      "ordinal": 2,
+      "unitKey": "unit.a1.smoke.u2",
+      "unitVersion": 1
+    },
+    {
+      "ordinal": 3,
+      "unitKey": "unit.a1.smoke.u3",
+      "unitVersion": 1
+    },
+    {
+      "ordinal": 4,
+      "unitKey": "unit.a1.smoke.u4",
+      "unitVersion": 1
+    },
+    {
+      "ordinal": 5,
+      "unitKey": "unit.a1.smoke.u5",
+      "unitVersion": 1
+    },
+    {
+      "ordinal": 6,
+      "unitKey": "unit.a1.smoke.u6",
+      "unitVersion": 1
+    }
+  ]
+}

@@ -1,0 +1,929 @@
+{
+  "schemaVersion": 1,
+  "kind": "unit",
+  "unitKey": "unit.a1.m1.greetings",
+  "version": 1,
+  "moduleKey": "mod.a1.everyday",
+  "level": "A1",
+  "title": "Greetings and leave-takings",
+  "summary": "Learn to greet people and say goodbye in everyday A1 situations.",
+  "ordinal": 1,
+  "estimatedMinutes": 35,
+  "accessTier": "free",
+  "prerequisites": [],
+  "objectives": [
+    {
+      "objectiveKey": "obj.a1.m1.u1.greetings",
+      "objectiveVersion": 1,
+      "isPrimary": true
+    }
+  ],
+  "lessons": [
+    {
+      "ordinal": 1,
+      "required": true,
+      "lesson": {
+        "lessonKey": "lesson.a1.m1.u1.core",
+        "version": 1,
+        "title": "Hallo und tschüss",
+        "explanation": {
+          "type": "doc",
+          "version": 1,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "German has formal and informal greetings. Use "
+                },
+                { "type": "strong", "children": [{ "type": "text", "text": "Guten Tag" }] },
+                {
+                  "type": "text",
+                  "text": " with adults you do not know well."
+                }
+              ]
+            },
+            {
+              "type": "callout",
+              "tone": "tip",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Tschüss is informal; Auf Wiedersehen is more formal."
+                }
+              ]
+            }
+          ]
+        },
+        "examples": {
+          "type": "doc",
+          "version": 1,
+          "blocks": [
+            {
+              "type": "example",
+              "children": [
+                { "type": "text", "text": "A: Guten Morgen! B: Guten Morgen, Frau Weber." }
+              ]
+            },
+            {
+              "type": "list",
+              "ordered": false,
+              "items": [
+                { "children": [{ "type": "text", "text": "Hallo — informal hello" }] },
+                { "children": [{ "type": "text", "text": "Tschüss — informal goodbye" }] }
+              ]
+            }
+          ]
+        },
+        "completionRule": {
+          "kind": "required_activities",
+          "requireAllRequired": true
+        },
+        "estimatedMinutes": 30,
+        "activities": [
+          {
+            "ordinal": 1,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.explanation",
+              "version": 1,
+              "type": "explanation",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [{ "type": "text", "text": "Read the greeting overview." }]
+                  }
+                ]
+              },
+              "maxScore": "0",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "body": {
+                  "type": "doc",
+                  "version": 1,
+                  "blocks": [
+                    {
+                      "type": "heading",
+                      "level": 2,
+                      "children": [{ "type": "text", "text": "Common greetings" }]
+                    },
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Guten Morgen, Guten Tag, and Guten Abend follow the time of day."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "transcriptPolicy": null
+            }
+          },
+          {
+            "ordinal": 2,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.selection",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Which greeting is appropriate in the morning?"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "guten_morgen",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Guten Morgen" }]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "gute_nacht",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Gute Nacht" }]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": ["guten_morgen"]
+                },
+                "rationale": {
+                  "type": "doc",
+                  "version": 1,
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Guten Morgen is the standard morning greeting."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 3,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.matching",
+              "version": 1,
+              "type": "matching",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      { "type": "text", "text": "Match each German greeting to its meaning." }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "2.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "left": [
+                  {
+                    "id": "hallo",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Hallo" }]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "tschuss",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Tschüss" }]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "right": [
+                  {
+                    "id": "hello",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Hello" }]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "bye",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Bye" }]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "matching.pairs.v1",
+                "answerSpec": {
+                  "kind": "matching",
+                  "pairs": [
+                    { "leftId": "hallo", "rightId": "hello" },
+                    { "leftId": "tschuss", "rightId": "bye" }
+                  ]
+                },
+                "maxScore": "2.000"
+              }
+            }
+          },
+          {
+            "ordinal": 4,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.ordering",
+              "version": 1,
+              "type": "ordering",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Put the dialogue lines in a natural order."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "items": [
+                  {
+                    "id": "line_a",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Guten Tag!" }]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "line_b",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Guten Tag, Frau Klein." }]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "line_c",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [{ "type": "text", "text": "Auf Wiedersehen!" }]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "ordering.sequence.v1",
+                "answerSpec": {
+                  "kind": "ordered",
+                  "order": ["line_a", "line_b", "line_c"]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 5,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.cloze",
+              "version": 1,
+              "type": "cloze",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      { "type": "text", "text": "Complete the greeting." }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "segments": [
+                  { "type": "text", "text": "Guten " },
+                  { "type": "blank", "blankId": "time_of_day" },
+                  { "type": "text", "text": "!" }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "cloze.blanks.v1",
+                "answerSpec": {
+                  "kind": "cloze",
+                  "blanks": [
+                    {
+                      "blankId": "time_of_day",
+                      "accept": {
+                        "kind": "case_folded",
+                        "value": "Tag"
+                      }
+                    }
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 6,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.typed",
+              "version": 1,
+              "type": "typed_response",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Type the informal German word for goodbye."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "maxLength": 40,
+                "inputHint": "one German word"
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "typed.weighted.v1",
+                "answerSpec": {
+                  "kind": "weighted_alternatives",
+                  "alternatives": [
+                    { "value": "Tschüss", "weight": "1.0", "match": "case_folded" },
+                    { "value": "Tschues", "weight": "0.5", "match": "case_folded" }
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 7,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.listening",
+              "version": 1,
+              "type": "listening",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Listen to the short dialogue and answer the question."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [
+                {
+                  "assetKey": "asset.a1.m1.u1.dialogue.audio",
+                  "purpose": "audio",
+                  "ordinal": 1,
+                  "contentType": "audio/mpeg",
+                  "sourcePath": "assets/a1/m1/u1/dialogue.mp3",
+                  "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "altText": "Two speakers exchanging morning greetings",
+                  "transcript": {
+                    "type": "doc",
+                    "version": 1,
+                    "blocks": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "text": "A: Guten Morgen! B: Guten Morgen, Herr Braun."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "configuration": {
+                "items": [
+                  {
+                    "type": "selection",
+                    "prompt": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "What time of day is it in the dialogue?"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "configuration": {
+                      "mode": "single",
+                      "options": [
+                        {
+                          "id": "morning",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [{ "type": "text", "text": "Morning" }]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "evening",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [{ "type": "text", "text": "Evening" }]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "answerKey": {
+                      "version": 1,
+                      "scoringAlgorithmVersion": "selection.single.v1",
+                      "answerSpec": {
+                        "kind": "set",
+                        "values": ["morning"]
+                      },
+                      "maxScore": "1.000"
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": "after_first_submission"
+            }
+          },
+          {
+            "ordinal": 8,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.writing",
+              "version": 1,
+              "type": "writing",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Write two short lines: greet a classmate and say goodbye."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "4.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "minChars": 10,
+                "maxChars": 200,
+                "guidance": {
+                  "type": "doc",
+                  "version": 1,
+                  "blocks": [
+                    {
+                      "type": "paragraph",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Use Hallo or Guten Tag, then Tschüss or Auf Wiedersehen."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "transcriptPolicy": null,
+              "rubric": {
+                "rubricKey": "rubric.a1.writing.greetings",
+                "version": 1,
+                "dimensions": [
+                  {
+                    "code": "task_completion",
+                    "title": "Task completion",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Includes a greeting and a leave-taking."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "grammar",
+                    "title": "Grammar",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Basic word order and capitalization are acceptable for A1."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "vocabulary",
+                    "title": "Vocabulary",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Uses level-appropriate greeting vocabulary."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "clarity",
+                    "title": "Clarity",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Meaning is understandable to a sympathetic reader."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  }
+                ],
+                "scoringRule": {
+                  "kind": "sum_dimensions",
+                  "passThreshold": "2.500"
+                }
+              }
+            }
+          },
+          {
+            "ordinal": 9,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.m1.u1.formative",
+              "version": 1,
+              "type": "formative_check",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Quick check: confirm the greetings you practiced."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "2.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.m1.u1.greetings",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "items": [
+                  {
+                    "type": "selection",
+                    "prompt": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Which form is more formal?"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "configuration": {
+                      "mode": "single",
+                      "options": [
+                        {
+                          "id": "tschuss",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [{ "type": "text", "text": "Tschüss" }]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "auf_wiedersehen",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [{ "type": "text", "text": "Auf Wiedersehen" }]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "answerKey": {
+                      "version": 1,
+                      "scoringAlgorithmVersion": "selection.single.v1",
+                      "answerSpec": {
+                        "kind": "set",
+                        "values": ["auf_wiedersehen"]
+                      },
+                      "maxScore": "1.000"
+                    }
+                  },
+                  {
+                    "type": "typed_response",
+                    "prompt": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Type Guten Tag with correct spacing."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "configuration": {
+                      "maxLength": 20
+                    },
+                    "answerKey": {
+                      "version": 1,
+                      "scoringAlgorithmVersion": "typed.normalized.v1",
+                      "answerSpec": {
+                        "kind": "normalized",
+                        "value": "Guten Tag"
+                      },
+                      "maxScore": "1.000"
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+# Pinned OpenAPI lint + generation configuration (DM-025, ADR-008).
+# Source of truth remains docs/openapi.yaml (OpenAPI 3.1). These rules enforce
+# structural contract hygiene without requiring stylistic fields the MVP
+# contract intentionally omits (per-operation summary text).
+# openapi-typescript reads `x-openapi-ts` for generation output.
+
+apis:
+  deutsch-mate@v1:
+    root: docs/openapi.yaml
+    # Generation flags are passed by scripts/openapi/generate.ts; only output
+    # location is declared here for openapi-typescript's redocly integration.
+    x-openapi-ts:
+      output: ./packages/api-schemas/src/generated/openapi.ts
+
+extends:
+  - recommended
+
+rules:
+  # Descriptions live in docs/API.md; operationId is the machine key.
+  operation-summary: off
+  tag-description: off
+  # Health liveness intentionally has no 4xx; readiness uses 503 only.
+  operation-4xx-response: warn
+  # Proprietary license object is intentional.
+  info-license-strict: warn
+  # Contract invariants we always enforce.
+  operation-operationId: error
+  operation-operationId-unique: error
+  no-unresolved-refs: error
+  struct: error

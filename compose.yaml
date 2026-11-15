@@ -1,0 +1,49 @@
+# Local development services only (DM-002). Production infrastructure is
+# provisioned exclusively through infra/ (ADR-007, ADR-019).
+#
+# Host ports and credentials are configurable via .env (see .env.example);
+# defaults are non-standard to avoid collisions with other local stacks.
+# The default password is local-only and clearly non-production.
+
+name: deutsch-mate
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: deutsch-mate-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-deutsch_mate}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-dev-only-not-a-secret}
+      POSTGRES_DB: ${POSTGRES_DB:-deutsch_mate_dev}
+    ports:
+      - "${POSTGRES_PORT:-54329}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-deutsch_mate} -d ${POSTGRES_DB:-deutsch_mate_dev}",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: deutsch-mate-redis
+    ports:
+      - "${REDIS_PORT:-63799}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  postgres-data:
+    name: deutsch-mate-postgres-data
+  redis-data:
+    name: deutsch-mate-redis-data

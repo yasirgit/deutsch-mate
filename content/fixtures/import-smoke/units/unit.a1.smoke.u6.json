@@ -1,0 +1,1505 @@
+{
+  "schemaVersion": 1,
+  "kind": "unit",
+  "unitKey": "unit.a1.smoke.u6",
+  "version": 1,
+  "moduleKey": "mod.a1.smoke",
+  "level": "A1",
+  "title": "Smoke unit 6",
+  "summary": "Minimal inventory unit 6 for import smoke tests.",
+  "ordinal": 6,
+  "estimatedMinutes": 25,
+  "accessTier": "premium",
+  "prerequisites": [
+    {
+      "unitKey": "unit.a1.smoke.u5",
+      "unitVersion": 1
+    }
+  ],
+  "objectives": [
+    {
+      "objectiveKey": "obj.a1.smoke.u6",
+      "objectiveVersion": 1,
+      "isPrimary": true
+    }
+  ],
+  "lessons": [
+    {
+      "ordinal": 1,
+      "required": true,
+      "lesson": {
+        "lessonKey": "lesson.a1.smoke.u6.core",
+        "version": 1,
+        "title": "Smoke lesson 6",
+        "explanation": {
+          "type": "doc",
+          "version": 1,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Explanation for smoke unit 6."
+                }
+              ]
+            }
+          ]
+        },
+        "examples": {
+          "type": "doc",
+          "version": 1,
+          "blocks": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Example for smoke unit 6."
+                }
+              ]
+            }
+          ]
+        },
+        "completionRule": {
+          "kind": "required_activities",
+          "requireAllRequired": true
+        },
+        "estimatedMinutes": 20,
+        "activities": [
+          {
+            "ordinal": 1,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel01",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 1 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_01",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_01",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_01"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 2,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel02",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 2 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_02",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_02",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_02"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 3,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel03",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 3 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_03",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_03",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_03"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 4,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel04",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 4 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_04",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_04",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_04"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 5,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel05",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 5 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_05",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_05",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_05"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 6,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel06",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 6 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_06",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_06",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_06"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 7,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel07",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 7 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_07",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_07",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_07"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 8,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel08",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 8 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_08",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_08",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_08"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 9,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel09",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 9 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_09",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_09",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_09"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 10,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel10",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 10 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_10",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_10",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_10"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 11,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel11",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 11 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_11",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_11",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_11"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 12,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.sel12",
+              "version": 1,
+              "type": "selection",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Smoke selection 12 for unit 6."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "mode": "single",
+                "options": [
+                  {
+                    "id": "opt_a_12",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option A"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "opt_b_12",
+                    "label": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Option B"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null,
+              "answerKey": {
+                "version": 1,
+                "scoringAlgorithmVersion": "selection.single.v1",
+                "answerSpec": {
+                  "kind": "set",
+                  "values": [
+                    "opt_a_12"
+                  ]
+                },
+                "maxScore": "1.000"
+              }
+            }
+          },
+          {
+            "ordinal": 13,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.listening",
+              "version": 1,
+              "type": "listening",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Listen to the smoke audio clip."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [
+                {
+                  "assetKey": "asset.a1.smoke.u6.audio",
+                  "purpose": "audio",
+                  "ordinal": 1,
+                  "contentType": "audio/mpeg",
+                  "sourcePath": "assets/u6.bin",
+                  "sha256": "d575e61759b1edfde8081b2dbce3e88a1a4a2bf721e7876afdca49eacdb835c6",
+                  "altText": "Smoke audio for unit 6",
+                  "transcript": {
+                    "type": "doc",
+                    "version": 1,
+                    "blocks": [
+                      {
+                        "type": "paragraph",
+                        "children": [
+                          {
+                            "type": "text",
+                            "text": "Hallo."
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "configuration": {
+                "items": [
+                  {
+                    "type": "selection",
+                    "prompt": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "What did you hear?"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "configuration": {
+                      "mode": "single",
+                      "options": [
+                        {
+                          "id": "hallo",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "text": "Hallo"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "tschuss",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "text": "Tschüss"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "answerKey": {
+                      "version": 1,
+                      "scoringAlgorithmVersion": "selection.single.v1",
+                      "answerSpec": {
+                        "kind": "set",
+                        "values": [
+                          "hallo"
+                        ]
+                      },
+                      "maxScore": "1.000"
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": "after_first_submission"
+            }
+          },
+          {
+            "ordinal": 14,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.writing",
+              "version": 1,
+              "type": "writing",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Write a short greeting."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "4.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "minChars": 5,
+                "maxChars": 120
+              },
+              "transcriptPolicy": null,
+              "rubric": {
+                "rubricKey": "rubric.a1.smoke.u6.writing",
+                "version": 1,
+                "dimensions": [
+                  {
+                    "code": "task_completion",
+                    "title": "Task completion",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Completes the greeting task."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "grammar",
+                    "title": "Grammar",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Acceptable A1 grammar."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "vocabulary",
+                    "title": "Vocabulary",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Uses expected vocabulary."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  },
+                  {
+                    "code": "clarity",
+                    "title": "Clarity",
+                    "description": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Meaning is clear."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "maxPoints": "1.000"
+                  }
+                ],
+                "scoringRule": {
+                  "kind": "sum_dimensions",
+                  "passThreshold": "2.500"
+                }
+              }
+            }
+          },
+          {
+            "ordinal": 15,
+            "activity": {
+              "schemaVersion": 1,
+              "activityKey": "act.a1.smoke.u6.formative",
+              "version": 1,
+              "type": "formative_check",
+              "level": "A1",
+              "prompt": {
+                "type": "doc",
+                "version": 1,
+                "blocks": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      {
+                        "type": "text",
+                        "text": "Quick formative check."
+                      }
+                    ]
+                  }
+                ]
+              },
+              "maxScore": "1.000",
+              "required": true,
+              "objectives": [
+                {
+                  "objectiveKey": "obj.a1.smoke.u6",
+                  "objectiveVersion": 1,
+                  "weight": "1.0"
+                }
+              ],
+              "assets": [],
+              "configuration": {
+                "items": [
+                  {
+                    "type": "selection",
+                    "prompt": {
+                      "type": "doc",
+                      "version": 1,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "children": [
+                            {
+                              "type": "text",
+                              "text": "Pick the greeting."
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "configuration": {
+                      "mode": "single",
+                      "options": [
+                        {
+                          "id": "hallo",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "text": "Hallo"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "id": "nein",
+                          "label": {
+                            "type": "doc",
+                            "version": 1,
+                            "blocks": [
+                              {
+                                "type": "paragraph",
+                                "children": [
+                                  {
+                                    "type": "text",
+                                    "text": "Nein"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    "answerKey": {
+                      "version": 1,
+                      "scoringAlgorithmVersion": "selection.single.v1",
+                      "answerSpec": {
+                        "kind": "set",
+                        "values": [
+                          "hallo"
+                        ]
+                      },
+                      "maxScore": "1.000"
+                    }
+                  }
+                ]
+              },
+              "transcriptPolicy": null
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

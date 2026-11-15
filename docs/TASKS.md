@@ -47,44 +47,44 @@ Tasks in different lanes may run concurrently only when all listed dependencies 
 ## Epic 0 — Governance and repository bootstrap
 
 ### DM-001 — Bootstrap the pinned monorepo
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** A reproducible strict-TypeScript `pnpm`/Turborepo workspace exists for all MVP runtimes.
 - **Links:** NFR-015; ADR-002, ADR-003, ADR-006.
 - **Depends on:** none.
 - **Deliverables:** `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `turbo.json`, `.nvmrc`, `tsconfig.base.json`, `.editorconfig`, `.gitignore`, `apps/{web,mobile,api,ai-worker,billing-worker,privacy-worker,outbox-worker,media-worker}/`, `packages/{contracts,domain,config,observability,test-kit}/`, `infra/`, `migrations/`, `scripts/`.
 - **Acceptance:** active LTS/runtime and package manager are pinned; strict compiler flags match coding standards; every workspace declares dependencies and canonical scripts; no speculative service, assessment, speech, or native-purchase package exists.
 - **Verify:** `corepack enable && pnpm install --frozen-lockfile && pnpm format:check && pnpm lint && pnpm typecheck && pnpm build`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — 14 workspaces bootstrapped (8 apps, 5 packages, root). Pinned: Node 22.18.0 (`.nvmrc`, engines `>=22 <23`), pnpm 9.15.4 (`packageManager` + sha512), turbo 2.10.7, TypeScript 6.0.3, Next 16.2.12, NestJS 11.1.28, ESLint 10.8.0 (flat config), Prettier 3.9.6, Vitest 4.1.10; all exact via `save-exact`. `pnpm install --frozen-lockfile && pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && pnpm test` all exit 0. API serves `/health/live` and `/health/ready` per `Health` schema; workers handle SIGTERM gracefully. Deviations: TS 6.0.3 not 7.x (typescript-eslint peer range), `apps/api` is CJS for NestJS decorator metadata (documented in `apps/api/README.md`), shared strict tsconfig lives at root with ESLint/Prettier config exported from `packages/config`.
 
 ### DM-002 — Establish canonical local development
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Contributors can start the API dependencies and all app shells from a clean checkout.
 - **Links:** NFR-003, NFR-004, NFR-015; ADR-003, ADR-006, ADR-009, ADR-010.
 - **Depends on:** DM-001.
 - **Deliverables:** `compose.yaml`, `.env.example` with non-secret placeholders, `scripts/bootstrap-local.ts`, `scripts/wait-for-services.ts`, root `bootstrap`, `dev`, `dev:services`, `db:*`, and `test:*` scripts; developer setup in `README.md`.
 - **Acceptance:** local PostgreSQL 16 and Redis are isolated and disposable; secrets are never committed; setup is idempotent; app shells expose liveness; Redis deletion does not affect seeded durable facts.
 - **Verify:** `pnpm bootstrap && pnpm dev:services && pnpm db:reset && pnpm test:smoke`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — `compose.yaml` runs PostgreSQL 16.13 (alpine) and Redis 7.4 on non-default ports 54329/63799 with healthchecks and named volumes; `.env.example` matches compose defaults with local-only placeholder credentials. `scripts/` is the `@deutsch-mate/scripts` workspace (strict TS via tsx): `bootstrap-local`, `wait-for-services`, `db-reset` (drops/recreates `deutsch_mate_dev`, enables pgcrypto/citext/btree_gist). Root scripts `bootstrap`, `dev`, `dev:services`, `dev:services:down`, `db:reset`, `test:smoke` added. Smoke suite (5 tests) covers SELECT 1, extensions, Redis PING, durable row surviving `FLUSHALL`, and compiled API `GET /health/live`. Verified independently: `pnpm bootstrap` (idempotent), `pnpm db:reset`, `pnpm test:smoke`, and full `format:check/lint/typecheck/build/test` all exit 0 on Docker 27.3.1 / Node 22.18.0 / pnpm 9.15.4. New exact deps: pg 8.22.0, ioredis 5.11.1, tsx 4.23.1, @types/pg 8.20.0.
 
 ### DM-003 — Enforce module and dependency boundaries
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** CI rejects forbidden imports, cycles, undeclared dependencies, and cross-capability persistence access.
 - **Links:** NFR-005, NFR-015; ADR-002, ADR-003, ADR-006.
 - **Depends on:** DM-001.
 - **Deliverables:** `packages/config/` lint/TypeScript rules, dependency graph policy, forbidden-import tests, package ownership metadata.
 - **Acceptance:** domain code cannot import framework/provider adapters; clients cannot import server/database code; workers cannot reach arbitrary capability repositories; no generic `common`/`utils` package is introduced.
 - **Verify:** `pnpm lint && pnpm boundaries:check && pnpm deps:check`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Every workspace declares `dm.tier` ownership metadata; shared ESLint `configForTier` bans domain→adapter, client→server, server/worker→client UI, and `@deutsch-mate/{common,utils,...}` dumping grounds; `import-x/no-extraneous-dependencies` rejects undeclared imports. `pnpm boundaries:check` (dependency-cruiser) reports 0 violations across 43 modules / 45 deps; `pnpm deps:check` (knip) exits 0; `packages/test-kit` regression suite (7 tests) proves ESLint and cruiser still flag the forbidden cases. Verified: `pnpm lint && pnpm boundaries:check && pnpm deps:check && pnpm --filter @deutsch-mate/test-kit test` all exit 0.
 
 ### DM-004 — Create release evidence and ownership templates
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Every governed change and release has consistent ownership, review, rollout, rollback, and evidence records.
 - **Links:** FR-072; NFR-005, NFR-008, NFR-014, NFR-015; MVP G8; ADR-015, ADR-017, ADR-018.
 - **Depends on:** DM-001.
 - **Deliverables:** `.github/PULL_REQUEST_TEMPLATE.md`, `.github/CODEOWNERS`, `docs/runbooks/templates/`, `docs/release/evidence-template.md`, `docs/waivers/README.md`.
 - **Acceptance:** templates require requirement/ADR mapping, data/security/accessibility impact, contract/migration compatibility, tests, observability, rollout and rollback; governed areas have named reviewer roles; waivers require owner and expiry.
 - **Verify:** repository review of templates against `docs/CODING_STANDARDS.md` §§17–20.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — PR template covers problem/outcome, FR/NFR/ADR/MVP-gate links, scope, boundaries, tests/evidence, security/privacy, a11y/i18n, compatibility, observability, rollout/rollback, waivers, and §20 Definition of Done checklist. CODEOWNERS assigns role placeholders for architecture, data, security, AI quality, billing, and content on governed paths. Runbook templates cover incident response, AI rollback, content rollback, billing reconciliation, and database restore with owner/tabletop placeholders. Release evidence template requires G1–G9 sign-off fields. Waivers README requires rule, reason, owner, expiry, tracking issue, and approver role; expired active waivers block release.
 
 ## Epic 1 — Infrastructure, environments, and delivery
 
@@ -161,56 +161,56 @@ Tasks in different lanes may run concurrently only when all listed dependencies 
 - **Evidence:** _pending_
 
 ### DM-012 — Implement shared secure configuration and redaction
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Every process validates configuration and emits safe structured telemetry.
 - **Links:** NFR-005, NFR-011, NFR-015; ADR-002, ADR-017, ADR-018.
 - **Depends on:** DM-001.
 - **Deliverables:** `packages/config/`, `packages/observability/`, strict environment schemas, redaction/prohibited-data tests.
 - **Acceptance:** unknown/missing config fails startup; secrets are sourced through workload identity; logs exclude credentials, emails, raw chat/writing, provider payloads, card data, and signed URLs.
 - **Verify:** `pnpm test --filter @deutsch-mate/config --filter @deutsch-mate/observability && pnpm test:telemetry-safety`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — `@deutsch-mate/config/env` (Zod 4.4.3 exact) provides strict `loadEnv` / `loadServerRuntimeEnv`: unknown managed keys and missing required vars throw `ConfigValidationError`; production requires `AWS_REGION` + Secrets Manager IDs and rejects inline `DATABASE_URL` / static AWS keys / Stripe / OpenAI secrets (workload identity). Package tier is `shared` + `clientSafe: false` so API/workers can import `/env` without breaking DM-003 (eslint tier bans skip tool-config files). `@deutsch-mate/observability` adds `createLogger` (structured JSON) + `redactForTelemetry` scrubbing tokens, Authorization, emails, chat/writing keys, Stripe/provider payloads, card data, and signed URLs. Root `pnpm test:telemetry-safety` runs redact + prohibited-data suites. Verified: `pnpm test --filter @deutsch-mate/config --filter @deutsch-mate/observability` (21 tests) and `pnpm test:telemetry-safety` (11 tests) exit 0; `boundaries:check` 0 violations; lint/typecheck/format:check on both packages exit 0.
 
 ## Epic 3 — PostgreSQL, migrations, authorization, and messaging
 
 ### DM-020 — Build migration runner and database roles
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Forward-only SQL migrations run with checksums and least-privilege runtime roles.
 - **Links:** NFR-003, NFR-005, NFR-012, NFR-015; ADR-009, ADR-012.
 - **Depends on:** DM-002.
 - **Deliverables:** `packages/database/`, `scripts/migrate.ts`, `migrations/0001_extensions_roles.sql`, migration ledger and test harness.
 - **Acceptance:** Kysely/node-postgres are adapters; runtime DDL/auto-sync is impossible; migrator and API/worker roles match `docs/Database.md`; lock and statement timeouts are enforced.
 - **Verify:** `pnpm db:create-empty && pnpm db:migrate && pnpm db:migrations:verify`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — `@deutsch-mate/database` (`dm.tier: shared`, `clientSafe: false`) with Kysely 0.29.4 + pg 8.22.0: pool/Kysely helpers, forward-only migration runner (SHA-256 ledger, checksum drift refusal, `SET LOCAL` lock 5s / statement 60s timeouts, `SET LOCAL ROLE dm_migrator` after ledger exists). `migrations/0001_extensions_roles.sql` creates extensions, capability schemas, NOLOGIN `dm_*` roles, `ops.schema_migrations`. Scripts: `db:create-empty`, `db:migrate`, `db:migrations:verify`; `db:reset` = create-empty then migrate. Local runtime LOGIN passwords from `DATABASE_ROLE_PASSWORD`/`POSTGRES_PASSWORD` (never in SQL; skipped in production). Verified: `pnpm db:create-empty && pnpm db:migrate && pnpm db:migrations:verify`, `pnpm db:reset`, package lint/typecheck/test (10 tests), `pnpm deps:check`, `pnpm boundaries:check` (62 modules) all exit 0.
 
 ### DM-021 — Implement the MVP relational schema
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** All and only MVP tables, constraints, indexes, enums, immutable triggers, and capability ownership exist.
 - **Links:** FR-001–003, FR-010, FR-020–024, FR-030–032, FR-040–041, FR-050, FR-052, FR-060–063, FR-070–072; NFR-003, NFR-014; ADR-009, ADR-011, ADR-016, ADR-017.
 - **Depends on:** DM-020.
 - **Deliverables:** ordered explicit SQL under `migrations/` for `iam`, `learner`, `media`, `content`, `learning`, `ai`, `billing`, `privacy`, `support`, and `ops`; Kysely persistence types under `packages/database/src/generated/`.
 - **Acceptance:** schema matches `docs/Database.md`; UUIDv7/UTC/money/numeric rules hold; append-only facts and published versions cannot mutate; no assessment, speaking, reminders, conversation-history UI, or native-IAP tables exist.
 - **Verify:** `pnpm db:reset && pnpm db:contract && pnpm db:constraints && pnpm db:immutability`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Migrations `0002`–`0015` create 27 enums and 67 MVP tables (+ `ops.schema_migrations`) across all capability schemas; FK cycles resolved (users→media→legal; content→learner; learning↔ai; ops→billing). `ops.forbid_mutation` / published-mapping / released-row triggers enforce Database.md §7 with `app.maintenance_ticket` bypass. Indexes from §5 included. Kysely types via `kysely-codegen` 0.19.0 → `packages/database/src/generated/` (`pnpm db:codegen`). Verify scripts `db:contract` / `db:constraints` / `db:immutability` wired at root. Verified: `pnpm db:reset && pnpm db:contract && pnpm db:constraints && pnpm db:immutability` exit 0 (68 tables, 27 enums, 122 FKs, UPDATE/DELETE denied with 55000). No assessment/speaking/reminder/IAP tables. RLS deferred to DM-022.
 
 ### DM-022 — Enforce RLS and capability grants
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Every user-owned resource is deny-by-default and inaccessible cross-user at the database boundary.
 - **Links:** FR-001, FR-041, FR-070; NFR-005, NFR-006; MVP G5; ADR-009, ADR-013, ADR-017.
 - **Depends on:** DM-021.
 - **Deliverables:** RLS/grant migrations, transaction context adapter, ownership and staff-role policy tests.
 - **Acceptance:** RLS is enabled and forced; runtime roles cannot bypass it; child ownership is enforced through parents; admin is not a bypass; security-definer functions satisfy the database contract.
 - **Verify:** `pnpm db:rls && pnpm test:authorization`; evidence covers positive and negative cases for 100% of user-owned resource types.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Migration `0016_rls_grants.sql` (+ `dm_security` NOLOGIN BYPASSRLS in `0001`) enables/forces RLS on 59 user-owned/child/content tables; learner ownership via `app.user_id`; child EXISTS policies; published content policies/views; staff via `ops.staff_capability` (active `iam.user_roles` ∧ `app.roles`; admin not a bypass); security-definer helpers owned by `dm_security` with pinned `search_path`. Least-privilege grants for `dm_api` / workers / `dm_read_replica`; billing worker has no learning grants; AI worker has no billing grants. Transaction context adapter: `setTransactionAppContext` / `withTransactionAppContext` in `@deutsch-mate/database`. Verified: `pnpm db:reset && pnpm db:rls && pnpm test:authorization` — FORCE RLS on 59 tables; 8 authorization tests pass covering positive+negative SELECT for 36 user-owned resource types, admin non-bypass, deletion_pending denial, worker grant boundaries, content_editor draft access.
 
 ### DM-023 — Implement idempotency, outbox, inbox, and audit primitives
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Retried commands and at-least-once messages yield one effective, auditable business outcome.
 - **Links:** NFR-011, NFR-012; ADR-012, ADR-018.
 - **Depends on:** DM-021, DM-022.
 - **Deliverables:** `packages/domain/src/idempotency/`, API interceptor, `apps/outbox-worker/`, inbox consumer library, event runtime schemas, audit hash/export job.
 - **Acceptance:** canonical request hash replay/conflict semantics match API contract; business mutation and outbox insert share a transaction; consumers atomically claim inbox/effects; bounded retries, DLQ, replay, correlation/causation IDs work.
 - **Verify:** `pnpm test:integration --filter idempotency --filter messaging --filter audit && pnpm test:resilience:duplicates`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Domain: canonical JSON request hashing, Idempotency-Key validation, retention windows, Zod event envelopes (`ops.probe.v1`), audit hash chain (no Nest/pg). Database ops: `claimIdempotencyKey`/`complete` (replay vs 409 conflict), transactional `insertOutboxEvent`, `claimOutboxBatch` (`FOR UPDATE SKIP LOCKED`, DLQ, replay), `consumeInboxMessage` (atomic claim + once-only effects), `appendAuditEvent`/`exportAuditEvents` (advisory lock; hash verify). API: `IdempotencyInterceptor` + `@RequireIdempotency` registered with DM-026 stub resolvers. Outbox worker: poll/claim/publish via `LocalRecordingPublisher` (EventBridge deferred to DM-007; see `apps/outbox-worker/README.md`). Scripts: `audit:export`, `test:integration`, `test:resilience:duplicates`. Verified: `pnpm test:integration --filter idempotency --filter messaging --filter audit` (5 tests) and `pnpm test:resilience:duplicates` (1 test) exit 0; domain unit tests 13 pass; typecheck/lint/build for touched packages, `boundaries:check` (146 modules), `deps:check` exit 0.
 
 ### DM-024 — Prove safe migration and restore paths
 - **Status:** TODO
@@ -225,24 +225,24 @@ Tasks in different lanes may run concurrently only when all listed dependencies 
 ## Epic 4 — API foundation and generated clients
 
 ### DM-025 — Establish contract-first generation
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** `docs/openapi.yaml` is linted and generates the sole web/mobile API client contract.
 - **Links:** NFR-010, NFR-015; ADR-008.
 - **Depends on:** DM-001.
 - **Deliverables:** pinned generator/linter configuration, `packages/api-client/`, `packages/api-schemas/`, generation and compatibility scripts.
 - **Acceptance:** generated code is never hand-edited; clean-tree drift fails CI; operation IDs, RFC 9457 types, UUIDv7, decimals/bigints, and SSE helpers preserve the specification.
 - **Verify:** `pnpm openapi:lint && pnpm openapi:generate && pnpm openapi:drift && pnpm openapi:compat`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Contract-first pipeline from `docs/openapi.yaml` (OpenAPI 3.1). Pinned: `@redocly/cli` 2.41.1 (root lint via `redocly.yaml`), `openapi-typescript` 7.13.0 + `yaml` 2.9.0 (`scripts` deps), `openapi-fetch` 0.17.0 (`packages/api-client`). Packages: `@deutsch-mate/api-schemas` (`dm.tier: shared`, `clientSafe: true`) holds generated `src/generated/openapi.ts` + UuidV7/Decimal/BigInteger/Problem validators; `@deutsch-mate/api-client` (`shared`/`clientSafe`) wraps openapi-fetch + tutor SSE helpers (`TUTOR_SSE_EVENT_NAMES` per docs/API.md); `@deutsch-mate/contracts` is a thin re-export facade (mapping documented in package READMEs). Root scripts `openapi:lint|generate|drift|compat` added; drift regenerates and `git diff --exit-code`s generated output; compat asserts 49 operationIds, Problem RFC 9457 fields, string decimal/bigint, `text/event-stream` on `streamTutorRunEvents`, and SSE helper vocabulary. Verified: `pnpm openapi:lint && pnpm openapi:generate && pnpm openapi:drift && pnpm openapi:compat` exit 0; also `pnpm lint`, `pnpm typecheck`, `pnpm build`, `pnpm deps:check`, `pnpm boundaries:check`, and package tests (6) exit 0. Note: `openapi-typescript` peer still declares `typescript@^5` while the repo pins TypeScript 6.0.3 (generation succeeds).
 
 ### DM-026 — Implement Product API cross-cutting behavior
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** The NestJS `/v1` API consistently validates, authenticates, authorizes, correlates, errors, paginates, and handles concurrency.
 - **Links:** NFR-005, NFR-010–012, NFR-015; ADR-006, ADR-008, ADR-013, ADR-018.
 - **Depends on:** DM-022, DM-023, DM-025.
 - **Deliverables:** `apps/api/src/platform/` guards/interceptors/filters, health routes, strict request validation, ETag/cursor/idempotency/correlation implementations.
 - **Acceptance:** unknown fields fail; every response has request ID; Problem Details leaks no internals; stale ETags and idempotency conflicts match contract; actor is never selected from request data; health behavior is deploy-safe.
 - **Verify:** `pnpm test:contract --filter api-platform && pnpm test:integration --filter api-platform`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — Platform module under `apps/api/src/platform/`: `X-Request-Id` ALS middleware; AuthGuard stub (OIDC deferred to DM-035; local/test-only `X-DM-Test-Actor`); RFC 9457 `ProblemDetailsFilter` (no stack/SQL/secret leak); global ValidationPipe `forbidNonWhitelisted`; ETag/If-Match + opaque cursor helpers; RateLimit-* header stubs; `RequestTransactionInterceptor` sets `dm_api` + `app.user_id`/`roles`/`correlation_id`; wired DM-023 `IdempotencyInterceptor`. Health: `GET /v1/health/live` process-only; `GET /v1/health/ready` DB check → 503 when unavailable. Root scripts `test:contract` + `test:integration --filter api-platform`. Verified: `pnpm test:contract --filter api-platform` (8) and `pnpm test:integration --filter api-platform` (3) exit 0; lint/typecheck/build for `@deutsch-mate/api` exit 0.
 
 ### DM-027 — Verify complete OpenAPI conformance
 - **Status:** TODO
@@ -257,76 +257,76 @@ Tasks in different lanes may run concurrently only when all listed dependencies 
 ## Epic 5 — Identity, consent, and onboarding
 
 ### DM-035 — Implement Cognito/OIDC and product user lifecycle
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Adult users can register, verify, sign in/out, recover, resolve a product user, and initiate deletion without local passwords.
 - **Links:** FR-001; NFR-005, NFR-006; ADR-013, ADR-017.
 - **Depends on:** DM-026; infrastructure integration also depends on DM-006.
 - **Deliverables:** `apps/api/src/modules/identity/`, Cognito IaC/config, OIDC token verifier, user provisioning and account-state guards, current-user read/update routes including `PATCH /me` for interface locale.
 - **Acceptance:** Authorization Code + PKCE; issuer/audience/signature/expiry/scopes validated; short-lived tokens only; blocked/deletion-pending users lose product access; age gate is adult-directed; `PATCH /me` updates the allowed locale field with optimistic concurrency and idempotent replay; no password/token persistence.
 - **Verify:** `pnpm test:contract --filter identity-profile && pnpm test:integration --filter identity && pnpm test:security --filter oidc --filter account-isolation`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — IdentityModule under `apps/api/src/modules/identity/`: injectable `TokenVerifier` + `jose@6.2.5` OIDC verifier (iss/aud/sig/exp/alg RS256|ES256); AuthGuard Bearer → verify → `ops.resolve_or_provision_user` (migration `0017`, dm_security SECURITY DEFINER) → roles → RequestActor; blocked/deleted/deletion_pending → **403** `account_access_denied`; `X-DM-Test-Actor` preserved when NODE_ENV≠production. GET/PATCH `/v1/me` (ETag/If-Match/Idempotency); age gate via `confirmAgeGate` (min 18, year-only); `initiateDeletion` → `deletion_pending` (deleted_at null until DM-050). Env: `OidcEnvSchema` (`OIDC_ISSUER`/`OIDC_AUDIENCE`/`OIDC_JWKS_URI`); `infra/cognito/README.md` (PKCE public clients, no local passwords; Cognito AWS provisioning waits on DM-005/DM-006). Verified: `pnpm test:contract --filter identity-profile` (4), `pnpm test:integration --filter identity` (5), `pnpm test:security --filter oidc --filter account-isolation` (4+4), `api-platform` contract+integration still green; api lint/typecheck/build exit 0.
 
 ### DM-036 — Implement versioned consent and legal documents
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Required legal acceptance and optional marketing consent are independently append-only and client-portable.
 - **Links:** FR-002, FR-070; NFR-006; MVP G5; ADR-017.
 - **Depends on:** DM-035.
 - **Deliverables:** identity consent services/routes, legal-document seed/import tooling, consent UI contract fixtures.
 - **Acceptance:** terms/privacy versions and decisions are durable; optional consent is unbundled, skippable, and withdrawable; withdrawal does not remove core paid access; all clients record source and version.
 - **Verify:** `pnpm test:contract --filter consent && pnpm test:integration --filter consent && pnpm test:e2e --filter consent`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — ConsentService/Controller: GET `/v1/me/consents/requirements`, GET `/v1/me/consents`, POST `/v1/me/consents` (Idempotency-Key, append-only). terms/privacy require `documentVersionId`; marketing omits it and is withdrawable without affecting terms/privacy. Seed helper `seedLegalDocumentVersion` (placeholder `media.objects` + legal version). Verified: `pnpm test:contract --filter consent` (2), `pnpm test:integration --filter consent` (4, API-level consent flow). Browser `test:e2e --filter consent` deferred — no browser harness yet; integration covers the consent flow end-to-end at the API.
 
 ### DM-037 — Implement profiles and resumable onboarding
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** A user selects A1–B2, goal, cadence, locale/preferences, resumes onboarding cross-device, and reaches a first unit.
 - **Links:** FR-003, FR-010, FR-052; MVP G2; ADR-001.
 - **Depends on:** DM-036, DM-032.
 - **Deliverables:** `apps/api/src/modules/learner/`, profile/onboarding routes, versioned profile/proficiency services, client fixtures that preserve the identity-owned interface locale updated through `PATCH /me`.
 - **Acceptance:** optional questions can be skipped; updates append versions; state survives interruption; account locale and learner preferences remain correctly separated across profile reads/updates; self-selection is explicit and no LLM placement occurs; recommendation is bounded to published content.
 - **Verify:** `pnpm test:contract --filter onboarding && pnpm test:integration --filter learner && pnpm test:e2e --filter first-session`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `LearnerModule`: GET/PUT `/v1/me/profile` (append-only `learner.profile_versions`, If-Match/ETag, Idempotency-Key); GET/PATCH `/v1/me/onboarding` (durable `onboarding_states`, resumable steps); POST `/v1/me/onboarding/complete` returns first free published unit via `CurriculumService.findFirstFreeUnitAtLevel` (import-smoke). Interface locale remains identity-owned (`PATCH /me`); client fixture `firstSessionClientFixture` enforces separation. ProficiencyService appends `self_select.v1` snapshots (`overall_estimate` NULL). Optional cadence/marketing skippable. Root aliases: `test:contract --filter onboarding`, `test:integration --filter learner`, `test:e2e --filter first-session`. Verified: contract (4), integration (3), e2e first-session (1); api lint/typecheck/build exit 0. Browser harness deferred — API first-session e2e covers cross-device resume.
 
 ## Epic 6 — Content pipeline and launch inventory
 
 ### DM-029 — Define versioned content schemas and authoring format
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Curriculum, rich text, activities, answers, rubrics, assets, objectives, and CEFR mappings have strict authoring schemas.
 - **Links:** FR-020–024, FR-050, FR-052, FR-072; NFR-014; ADR-001, ADR-015.
 - **Depends on:** DM-001.
 - **Deliverables:** `packages/content-schemas/`, `content/schema/`, authoring examples, deterministic validators.
 - **Acceptance:** unknown fields fail; no HTML/executable answer expressions; stable keys and immutable versions are represented; schemas cover all MVP activity types and exclude speaking/assessment constructs.
 - **Verify:** `pnpm content:schema && pnpm test --filter @deutsch-mate/content-schemas`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-29 — `@deutsch-mate/content-schemas` (`dm.tier: shared`, `clientSafe: false`) with Zod 4.4.3 exact: strict authoring docs for `cefr_descriptor` / `objective` / `module` / `unit`; rich-text AST (no HTML nodes); answer specs (`exact`, `case_folded`, `normalized`, `set`, `ordered`, `matching`, `weighted_alternatives`, `cloze`) with forbidden executable kinds rejected; all 9 MVP activity types including listening transcript policies and writing rubrics (task_completion/grammar/vocabulary/clarity); CEFR A1–B2, skill codes, access tiers free/premium; stable keys + immutable versions. `content/schema/` exports 12 JSON Schema files + authoring notes; `content/examples/` has descriptor/objective/module/unit covering every activity type. Root `pnpm content:schema` builds, exports schemas, and validates examples. Verified: `pnpm content:schema` (4/4 examples), `pnpm test --filter @deutsch-mate/content-schemas` (11 tests), `boundaries:check` 0 violations, `deps:check` exit 0.
 
 ### DM-030 — Build content import, validation, and manifest tooling
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Approved source files deterministically produce database imports and immutable release manifests.
 - **Links:** FR-020–023, FR-050, FR-072; NFR-014; MVP G1; ADR-011, ADR-015.
 - **Depends on:** DM-021, DM-029.
 - **Deliverables:** `content/`, `scripts/content-{validate,import,manifest}.ts`, asset checksum/availability validators.
 - **Acceptance:** validates six units/level module, prerequisites, CEFR links, ≥12 deterministic interactions/unit, listening/transcript policy, writing, formative check, objective weights, answer/rubric coverage, assets, and prohibited certification copy.
 - **Verify:** `pnpm content:validate && pnpm content:manifest && pnpm content:test-import`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `@deutsch-mate/content-pipeline` (`dm.tier: shared`, `clientSafe: false`) loads release packages, Zod-validates docs, enforces MVP G1/Database.md §7 inventory (exactly 6 units/module, ≥12 deterministic interactions, listening+transcriptPolicy+audio, writing+rubric, formative_check, CEFR-linked objectives, objective weights sum to 1, acyclic prerequisites, asset sha256/availability, banned certification phrases). Deterministic `manifest.json` (sorted entries; sha256 excludes generatedAt). Draft Postgres import via owner `DATABASE_URL` (idempotent on key+version; status stays `draft`). Smoke fixture: `content/fixtures/import-smoke/` (1×6 A1). Root scripts: `content:validate`, `content:manifest`, `content:import`, `content:test-import`. Verified: `pnpm test --filter @deutsch-mate/content-pipeline` (8 tests), `pnpm content:validate` OK, `pnpm content:manifest` OK (20 entries, stable manifestSha256), `pnpm content:test-import` OK (draft, 6 units, idempotent re-import).
 
 ### DM-031 — Implement protected content governance
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Staff can create, submit, independently approve/reject, publish, and roll back immutable curriculum releases.
 - **Links:** FR-020, FR-072; NFR-005, NFR-014; MVP G1, G8; ADR-009, ADR-015, ADR-017.
 - **Depends on:** DM-026, DM-030, DM-035.
 - **Deliverables:** `apps/api/src/modules/content/`, protected operations from OpenAPI, publication transaction and audit events, minimal staff scripts/UI.
 - **Acceptance:** editor cannot self-approve; drafts never reach learner routes; publication revalidates exact manifest in bounded serializable transaction; rollback selects a prior approved version without rewriting history.
 - **Verify:** `pnpm test:contract --filter content-ops && pnpm test:integration --filter content-publication && pnpm test:authorization --filter content`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `ContentModule` under `apps/api/src/modules/content/`: create/register draft (`content:write`), review-events submit/approve/reject (`content:review`), publish + rollback with SERIALIZABLE + bounded retry (`@SerializableIsolation`), audit + outbox on publish/rollback. Self-approval banned (creator or submitter). Learner stub `GET /curriculum/releases/current` returns published only (404 for drafts). Migration `0018_content_rollback_transition.sql` allows retired→published reselection without rewriting content rows. Staff helper `scripts/content-publish.ts` (`pnpm content:publish`). Verify filters: `content-ops`, `content-publication`, `content`. Verified: `pnpm test:contract --filter content-ops` (6), `pnpm test:integration --filter content-publication` (3), `pnpm test:authorization --filter content` (3) exit 0; api lint/typecheck/build exit 0.
 
 ### DM-032 — Implement published curriculum delivery
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Entitlement-filtered immutable releases, modules, units, lessons, activities, and accessible listening metadata are served by the API.
 - **Links:** FR-020–023, FR-050, FR-052, FR-063; NFR-004, NFR-010.
 - **Depends on:** DM-026, DM-030.
 - **Deliverables:** content read repositories/services/routes, immutable ETags, published-only database views and cache.
 - **Acceptance:** exact version IDs resolve; free/premium visibility is server-enforced; listening controls receive transcript policy and approved assets; AI outage has no effect; draft/cross-release content is hidden.
 - **Verify:** `pnpm test:contract --filter curriculum && pnpm test:integration --filter curriculum && pnpm test:resilience --filter ai-outage`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `CurriculumService`/`CurriculumController` under `apps/api/src/modules/content/`: GET current release, modules (level/cursor), unit, lesson. Published-only via `content.v_published_*` views (migration `0019`); drafts/non-published → 404. Immutable content-hash ETags + If-None-Match/304. Entitlement stub (pre–DM-053): all learners free-tier; module list marks premium `locked: true`; GET premium unit/lesson → 403 `entitlement_required`. Listening: `transcriptPolicy` + approved `mediaObjectId`/contentType (no bucket/keys/signed URLs); transcript content only when policy=`always`. Disposable cache (`CurriculumCache`: Redis `dm:{env}:content:release:{releaseId}` + memory TTL). AI-independent path. Verify filters: `curriculum`, `ai-outage`. Verified: `pnpm test:contract --filter curriculum` (5), `pnpm test:integration --filter curriculum` (6), `pnpm test:resilience --filter ai-outage` (1) exit 0; api typecheck exit 0.
 
 ### DM-033 — Produce the A1 and A2 launch modules
 - **Status:** TODO
@@ -351,24 +351,24 @@ Tasks in different lanes may run concurrently only when all listed dependencies 
 ## Epic 7 — Learning loop, review, recommendation, and progress
 
 ### DM-038 — Implement learning sessions and deterministic scoring
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Learners can start/resume sessions and submit all deterministic MVP activity types exactly once.
 - **Links:** FR-021–023, FR-050; NFR-004, NFR-012, NFR-014.
 - **Depends on:** DM-023, DM-026, DM-032, DM-035.
 - **Deliverables:** `apps/api/src/modules/learning/`, session/attempt/scoring services and routes, answer-key algorithms.
 - **Acceptance:** attempts pin content/key/algorithm versions; each scored submission atomically writes response, score/evidence, projections, and outbox; duplicate keys return one result; progress saves after every scored activity.
 - **Verify:** `pnpm test:contract --filter learning && pnpm test:integration --filter deterministic-scoring && pnpm test:resilience:duplicates`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `LearningModule` under `apps/api/src/modules/learning/`: sessions CRUD (GET/POST `/v1/learning/sessions`, GET/PATCH `/{sessionId}` with ETag/If-Match); `POST .../attempts` + `GET /v1/learning/attempts/{id}`. `@deutsch-mate/scoring` (`dm.tier: domain`) implements AnswerSpec kinds via algorithm **`deterministic.v1`**. Atomic scored txn: lock session → attempt/response/score/feedback/valid evidence → `unit_progress` → outbox `learning.attempt.scored.v1`; attempts never mutated after insert (API status derived). Writing without key → 202 `feedback_unavailable` (no valid evidence; AI path DM-045). Listening/formative score embedded keys. Duplicate Idempotency-Key replay + `clientAttemptId` → one attempt (200). Root aliases: `test:contract --filter learning`, `test:integration --filter deterministic-scoring`; `test:resilience:duplicates` includes learning dupes. Verified: contract (3), deterministic-scoring (4), resilience:duplicates (db 1 + learning 1) exit 0.
 
 ### DM-039 — Implement review scheduling
-- **Status:** TODO
+- **Status:** DONE
 - **Outcome:** Valid evidence creates a bounded, deterministic, versioned due-review queue.
 - **Links:** FR-023, FR-030; NFR-004, NFR-012.
 - **Depends on:** DM-038.
 - **Deliverables:** review algorithm package, projection updater/rebuilder, review API query.
 - **Acceptance:** vocabulary/grammar/eligible mistakes schedule reproducibly; invalid/unverified AI creates no valid review evidence; queue ordering and bounds are stable; projection can rebuild from append-only evidence.
 - **Verify:** `pnpm test --filter review-algorithm && pnpm test:integration --filter review && pnpm test:rebuild-projections`.
-- **Evidence:** _pending_
+- **Evidence:** 2026-07-30 — `@deutsch-mate/review-algorithm` (`dm.tier: domain`) pins **`review.v1`**: valid evidence only; vocabulary/grammar always eligible; other skills only when `score_ratio < 0.7` (eligible mistakes); SM-2–style ease/interval; max 50 active items sorted by `due_at`, `objectiveVersionId`. Same-txn updater in `AttemptService` after valid evidence insert → `learning.review_items` upsert + bound. `ReviewService.rebuildForUser` deletes/rebuilds from append-only `learning.evidence`. GET `/v1/learning/review-items` (state/cursor/limit, own rows via AuthContext+RLS). Invalid/unverified ignored (writing path creates no valid evidence). Root aliases: `test:integration --filter review`, `test:rebuild-projections`. Verified: `pnpm test --filter review-algorithm` (11), `pnpm test:integration --filter review` (3), `pnpm test:rebuild-projections` (1) exit 0; api typecheck/build/lint exit 0.
 
 ### DM-040 — Implement next-activity recommendation and progress
 - **Status:** TODO

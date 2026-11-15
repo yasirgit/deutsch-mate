@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "release",
+  "releaseKey": "release.import.smoke",
+  "version": 1,
+  "title": "Import smoke release",
+  "description": "Deterministic fixture for content validate/manifest/import (DM-030).",
+  "modules": [
+    {
+      "ordinal": 1,
+      "moduleKey": "mod.a1.smoke",
+      "moduleVersion": 1
+    }
+  ]
+}

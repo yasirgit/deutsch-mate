@@ -1,0 +1,52 @@
+# CODEOWNERS — governed-path review ownership (docs/CODING_STANDARDS.md §18)
+#
+# The @deutsch-mate/* teams below are role-based placeholders. They MUST be created
+# in the GitHub organization (with maintained membership) before branch protection
+# can enforce these rules; until then GitHub silently ignores unknown teams.
+#
+# Per CODING_STANDARDS §18: API, event, migration, dependency, AI release, billing,
+# identity, privacy, and infrastructure changes require reviewers who own those
+# risks. Authors cannot self-approve changes to governed areas — branch protection
+# must require review from someone other than the last pusher, and CODEOWNERS
+# review must be marked "required" on protected branches.
+#
+# Later rules override earlier ones for the same path; keep the most specific
+# rules last.
+
+# --- Default: architecture owns anything not claimed below -------------------
+*                                   @deutsch-mate/architecture
+
+# --- Client/API contracts (OpenAPI is the machine contract, ADR-008) ---------
+docs/openapi.yaml                   @deutsch-mate/architecture
+packages/contracts/                 @deutsch-mate/architecture
+
+# --- Database schema and persistence (ADR-009) -------------------------------
+migrations/                         @deutsch-mate/data
+packages/database/                  @deutsch-mate/data
+
+# --- Repository governance, CI/CD, and infrastructure (ADR-019) --------------
+.github/                            @deutsch-mate/architecture @deutsch-mate/security
+infra/                              @deutsch-mate/architecture @deutsch-mate/security
+
+# --- AI workflows, prompts, and evaluations (ADR-014, ADR-015) ---------------
+apps/ai-worker/                     @deutsch-mate/ai-quality @deutsch-mate/security
+evals/                              @deutsch-mate/ai-quality @deutsch-mate/security
+
+# --- Billing and entitlements (ADR-016) ---------------------------------------
+apps/billing-worker/                @deutsch-mate/billing @deutsch-mate/security
+
+# --- Versioned curriculum content ---------------------------------------------
+content/                            @deutsch-mate/content
+
+# --- Authority documents (AI_CONTEXT.md authority order) ----------------------
+docs/architecture.md                @deutsch-mate/architecture
+docs/MVP_SCOPE.md                   @deutsch-mate/architecture
+docs/PRD.md                         @deutsch-mate/architecture
+docs/Database.md                    @deutsch-mate/architecture @deutsch-mate/data
+docs/API.md                         @deutsch-mate/architecture
+docs/AI_AGENTS.md                   @deutsch-mate/architecture @deutsch-mate/ai-quality
+docs/DECISIONS.md                   @deutsch-mate/architecture
+docs/CODING_STANDARDS.md            @deutsch-mate/architecture
+
+# --- Waivers require the approving owner role (CODING_STANDARDS §1) ----------
+docs/waivers/                       @deutsch-mate/architecture @deutsch-mate/security

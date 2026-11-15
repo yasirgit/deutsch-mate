@@ -4,7 +4,7 @@
 
 Deutsch Mate is an EU-first B2C German-learning product for adult self-learners at CEFR A1–B2. The MVP proves a guided loop across responsive web, iOS, and Android: self-selected level, one human-approved six-unit module per level, deterministic lessons/review/progress, bounded AI tutor and writing correction, and web subscription billing.
 
-**Current state:** product, architecture, API, database, AI, governance, and MVP backlog documentation is complete. Implementation has not started. `docs/TASKS.md` is the executable source of work and status.
+**Current state:** documentation is complete. Implementation has started: DM-001–DM-004, DM-012, DM-020, DM-021, DM-022, DM-023, DM-025, DM-026, DM-029, DM-030, DM-031, DM-032, DM-035, DM-036, DM-037, DM-038, and DM-039 are `DONE`. DM-040 (recommendations/progress) is blocked on DM-053 (billing entitlements); prefer parallel DM-051 → DM-052 → DM-053, or other open lanes such as DM-005/DM-024. `docs/TASKS.md` is the executable source of work and status.
 
 ## Authority order
 
@@ -66,6 +66,7 @@ pnpm test
 pnpm build
 pnpm openapi:lint && pnpm openapi:generate && pnpm openapi:drift
 pnpm db:create-empty && pnpm db:migrate && pnpm db:test:upgrade && pnpm db:rls
+pnpm content:validate && pnpm content:manifest && pnpm content:test-import
 pnpm test:contract && pnpm test:integration && pnpm test:e2e
 pnpm test:a11y && pnpm test:security && pnpm test:telemetry-safety
 pnpm eval:offline && pnpm eval:gates

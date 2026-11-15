@@ -1,0 +1,76 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.test.ts", "!**/*.test.tsx"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "format": {
+      "cache": false
+    },
+    "format:check": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
+    "test:smoke": {
+      "dependsOn": ["@deutsch-mate/api#build"],
+      "env": ["DATABASE_URL", "REDIS_URL", "POSTGRES_*", "REDIS_*", "API_PORT"],
+      "cache": false
+    },
+    "//#lint:impl": {
+      "inputs": [
+        "eslint.config.mjs",
+        "prettier.config.mjs",
+        ".dependency-cruiser.cjs",
+        "package.json",
+        "packages/config/src/**",
+        "packages/config/package.json"
+      ],
+      "outputs": []
+    },
+    "//#boundaries:check:impl": {
+      "inputs": [
+        ".dependency-cruiser.cjs",
+        "pnpm-workspace.yaml",
+        "pnpm-lock.yaml",
+        "tsconfig.base.json",
+        "package.json",
+        "apps/**",
+        "packages/**",
+        "scripts/**"
+      ],
+      "outputs": []
+    },
+    "//#deps:check:impl": {
+      "inputs": [
+        "knip.jsonc",
+        "pnpm-workspace.yaml",
+        "pnpm-lock.yaml",
+        "tsconfig.base.json",
+        "package.json",
+        "*.mjs",
+        ".dependency-cruiser.cjs",
+        "apps/**",
+        "packages/**",
+        "scripts/**"
+      ],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

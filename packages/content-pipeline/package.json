@@ -1,0 +1,41 @@
+{
+  "name": "@deutsch-mate/content-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "dm": {
+    "tier": "shared",
+    "clientSafe": false
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deutsch-mate/content-schemas": "workspace:*",
+    "@deutsch-mate/domain": "workspace:*",
+    "pg": "8.22.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@deutsch-mate/config": "workspace:*",
+    "@types/node": "22.20.1",
+    "@types/pg": "8.20.0",
+    "eslint": "10.8.0",
+    "prettier": "3.9.6",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
